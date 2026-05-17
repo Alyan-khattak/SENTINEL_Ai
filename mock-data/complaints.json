@@ -1,0 +1,8 @@
+{
+  "captured_at": "2026-05-15T10:00:00",
+  "period_hours": 24,
+  "complaint_count": 23,
+  "topics": ["cooking oil unavailable", "delivery delays", "out of stock"],
+  "sentiment_score": -0.7,
+  "affected_skus": ["SKU001"]
+}

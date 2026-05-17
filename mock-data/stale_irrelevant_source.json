@@ -1,0 +1,8 @@
+{
+  "report_date": "2025-11-08",
+  "category": "office_supplies_inventory",
+  "items": [
+    { "name": "A4 Paper", "quantity": 12000 },
+    { "name": "Stapler Pins", "quantity": 8000 }
+  ]
+}

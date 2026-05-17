@@ -1,1 +1,43 @@
+# IDE
 .vscode/
+.idea/
+
+# Python
+backend/venv/
+backend/.venv/
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Environment / Secrets
+.env
+backend/.env
+
+# SQLite
+backend/db/app.db
+
+# Node
+node_modules/
+frontend-web/node_modules/
+frontend-web/dist/
+
+# Flutter
+frontend-mobile/.dart_tool/
+frontend-mobile/build/
+frontend-mobile/.packages
+frontend-mobile/.flutter-plugins
+frontend-mobile/.flutter-plugins-dependencies
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.apk
+demo/apk/

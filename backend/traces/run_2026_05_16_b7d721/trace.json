@@ -1,0 +1,739 @@
+{
+  "run_id": "run_2026_05_16_b7d721",
+  "scenario": "inventory_shortage",
+  "work_plan": {
+    "high_level_steps": [
+      "Data Ingestion",
+      "Data Preprocessing",
+      "Inventory Shortage Analysis",
+      "Root Cause Identification",
+      "Recommendation Generation",
+      "Result Validation"
+    ],
+    "expected_duration_seconds": 300,
+    "estimated_llm_calls": 10,
+    "fallback_strategy": "If primary approach fails, re-run the analysis pipeline with updated input sources or use a rule-based system as a fallback."
+  },
+  "task_plan": {
+    "tasks": [
+      {
+        "task_id": "T1",
+        "description": "Ingest csv data from mock-data/warehouse_stock_7days.csv",
+        "depends_on": [],
+        "agent_assigned": "data_ingestion_agent",
+        "expected_output_schema": "CSVData"
+      },
+      {
+        "task_id": "T2",
+        "description": "Ingest json data from mock-data/sales_dashboard.json, mock-data/complaints.json, mock-data/news_feed.json, mock-data/duplicate_spam_source.json, mock-data/stale_irrelevant_source.json",
+        "depends_on": [],
+        "agent_assigned": "data_ingestion_agent",
+        "expected_output_schema": "JSONData"
+      },
+      {
+        "task_id": "T3",
+        "description": "Extract relevant information from mock-data/supplier_email.pdf",
+        "depends_on": [],
+        "agent_assigned": "pdf_parsing_agent",
+        "expected_output_schema": "PDFData"
+      },
+      {
+        "task_id": "T4",
+        "description": "Preprocess ingested data by handling missing values and data normalization",
+        "depends_on": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "agent_assigned": "data_preprocessing_agent",
+        "expected_output_schema": "PreprocessedData"
+      },
+      {
+        "task_id": "T5",
+        "description": "Analyze preprocessed data to identify inventory shortage",
+        "depends_on": [
+          "T4"
+        ],
+        "agent_assigned": "analysis_agent",
+        "expected_output_schema": "InventoryShortageAnalysis"
+      },
+      {
+        "task_id": "T6",
+        "description": "Identify root cause of inventory shortage using LLM calls",
+        "depends_on": [
+          "T5"
+        ],
+        "agent_assigned": "llm_agent",
+        "expected_output_schema": "RootCauseIdentification"
+      },
+      {
+        "task_id": "T7",
+        "description": "Generate recommendations based on root cause analysis",
+        "depends_on": [
+          "T6"
+        ],
+        "agent_assigned": "recommendation_agent",
+        "expected_output_schema": "Recommendations"
+      },
+      {
+        "task_id": "T8",
+        "description": "Validate results and generate final report",
+        "depends_on": [
+          "T7"
+        ],
+        "agent_assigned": "report_generation_agent",
+        "expected_output_schema": "FinalReport"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "src_ef62346a",
+      "source_type": "csv",
+      "content": "CSV file with 9 rows and 4 columns.\nColumns: sku, name, quantity, recorded_at\n\n   sku           name  quantity         recorded_at\nSKU001 Cooking Oil 5L      8500 2026-05-08T08:00:00\nSKU001 Cooking Oil 5L      7800 2026-05-09T08:00:00\nSKU001 Cooking Oil 5L      7100 2026-05-10T08:00:00\nSKU001 Cooking Oil 5L      6300 2026-05-11T08:00:00\nSKU001 Cooking Oil 5L      5500 2026-05-12T08:00:00\nSKU001 Cooking Oil 5L      4400 2026-05-13T08:00:00\nSKU001 Cooking Oil 5L      3200 2026-05-14T08:00:00\nSKU002      Rice 25kg      4200 2026-05-08T08:00:00\nSKU002      Rice 25kg      4100 2026-05-14T08:00:00",
+      "metadata": {
+        "file_path": "mock-data/warehouse_stock_7days.csv",
+        "source_type": "csv",
+        "content_length": 598
+      },
+      "recorded_at": "2026-05-16T14:19:24.355204Z",
+      "ingested_at": "2026-05-16T14:19:24.355204Z"
+    },
+    {
+      "source_id": "src_969f466e",
+      "source_type": "json",
+      "content": "{\n  \"report_date\": \"2026-05-15\",\n  \"period\": \"last_7_days\",\n  \"metrics\": {\n    \"demand_change_percent\": 42,\n    \"skus_at_risk\": [\n      \"SKU001\",\n      \"SKU002\"\n    ],\n    \"stockout_probability\": 0.91,\n    \"daily_units_sold\": [\n      620,\n      680,\n      720,\n      800,\n      880,\n      1050,\n      1200\n    ]\n  },\n  \"trend\": \"rapidly_rising\"\n}",
+      "metadata": {
+        "file_path": "mock-data/sales_dashboard.json",
+        "source_type": "json",
+        "content_length": 346,
+        "report_date": "2026-05-15"
+      },
+      "recorded_at": "2026-05-15T00:00:00",
+      "ingested_at": "2026-05-16T14:19:24.355204Z"
+    },
+    {
+      "source_id": "src_f524fc39",
+      "source_type": "json",
+      "content": "{\n  \"captured_at\": \"2026-05-15T10:00:00\",\n  \"period_hours\": 24,\n  \"complaint_count\": 23,\n  \"topics\": [\n    \"cooking oil unavailable\",\n    \"delivery delays\",\n    \"out of stock\"\n  ],\n  \"sentiment_score\": -0.7,\n  \"affected_skus\": [\n    \"SKU001\"\n  ]\n}",
+      "metadata": {
+        "file_path": "mock-data/complaints.json",
+        "source_type": "json",
+        "content_length": 247,
+        "captured_at": "2026-05-15T10:00:00"
+      },
+      "recorded_at": "2026-05-15T10:00:00",
+      "ingested_at": "2026-05-16T14:19:24.359758Z"
+    },
+    {
+      "source_id": "src_de739aa4",
+      "source_type": "json",
+      "content": "{\n  \"feed_timestamp\": \"2026-05-15T09:30:00\",\n  \"items\": [\n    {\n      \"headline\": \"Transport strike in Sindh enters day 3\",\n      \"source\": \"Dawn News\",\n      \"published_at\": \"2026-05-15T07:00:00\",\n      \"relevance_score\": 0.85\n    },\n    {\n      \"headline\": \"Fuel prices push delivery costs up 15%\",\n      \"source\": \"Business Recorder\",\n      \"published_at\": \"2026-05-14T18:00:00\",\n      \"relevance_score\": 0.7\n    }\n  ]\n}",
+      "metadata": {
+        "file_path": "mock-data/news_feed.json",
+        "source_type": "json",
+        "content_length": 423,
+        "feed_timestamp": "2026-05-15T09:30:00"
+      },
+      "recorded_at": "2026-05-15T09:30:00",
+      "ingested_at": "2026-05-16T14:19:24.359758Z"
+    },
+    {
+      "source_id": "src_f31af89f",
+      "source_type": "json",
+      "content": "{\n  \"report_date\": \"2026-05-15\",\n  \"summary\": \"DAILY SALES SUMMARY - PROMOTIONAL OFFERS INSIDE\",\n  \"data\": {\n    \"demand_change\": \"42%\",\n    \"at_risk\": [\n      \"SKU001\",\n      \"SKU002\"\n    ]\n  },\n  \"promotional_message\": \"Click here for 50% off all subscriptions\"\n}",
+      "metadata": {
+        "file_path": "mock-data/duplicate_spam_source.json",
+        "source_type": "json",
+        "content_length": 265,
+        "report_date": "2026-05-15"
+      },
+      "recorded_at": "2026-05-15T00:00:00",
+      "ingested_at": "2026-05-16T14:19:24.361805Z"
+    },
+    {
+      "source_id": "src_ff967e22",
+      "source_type": "json",
+      "content": "{\n  \"report_date\": \"2025-11-08\",\n  \"category\": \"office_supplies_inventory\",\n  \"items\": [\n    {\n      \"name\": \"A4 Paper\",\n      \"quantity\": 12000\n    },\n    {\n      \"name\": \"Stapler Pins\",\n      \"quantity\": 8000\n    }\n  ]\n}",
+      "metadata": {
+        "file_path": "mock-data/stale_irrelevant_source.json",
+        "source_type": "json",
+        "content_length": 222,
+        "report_date": "2025-11-08"
+      },
+      "recorded_at": "2025-11-08T00:00:00",
+      "ingested_at": "2026-05-16T14:19:24.361805Z"
+    },
+    {
+      "source_id": "src_989cd95b",
+      "source_type": "pdf",
+      "content": "URGENT - Stock Depletion Warning for SKU001\nFrom: ahmed@karachisupplies.pk\nTo: procurement@yourcompany.pk\nDate: 2026-05-15\nSubject: URGENT - Stock Depletion Warning for SKU001\nDear Procurement Team,\nBased on current dispatch rates analyzed from your warehouse data and our\ndelivery schedules, your SKU001 (Cooking Oil 5L) inventory will be fully\ndepleted within 48 hours. We strongly recommend placing an emergency order\nof at least 8,000 units immediately to avoid stockout.\nOur standard lead time is 24 hours for emergency orders if confirmed before\n6:00 PM today. Transport conditions in Sindh remain affected by the ongoing\nstrike, which may add 6-12 hours to delivery.\nPlease confirm at your earliest convenience.\nRegards,\nAhmed Khan\nKarachi Supplies Pvt Ltd",
+      "metadata": {
+        "file_path": "mock-data/supplier_email.pdf",
+        "source_type": "pdf",
+        "content_length": 763
+      },
+      "recorded_at": "2026-05-16T14:19:24.432941Z",
+      "ingested_at": "2026-05-16T14:19:24.432941Z"
+    }
+  ],
+  "noise_assessments": [
+    {
+      "source_id": "src_ef62346a",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 0,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    },
+    {
+      "source_id": "src_969f466e",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 1,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    },
+    {
+      "source_id": "src_f524fc39",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 1,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    },
+    {
+      "source_id": "src_de739aa4",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 1,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    },
+    {
+      "source_id": "src_f31af89f",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": true,
+      "is_stale": false,
+      "staleness_days": 1,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": false,
+      "rejection_reason": "Contains spam/promotional content"
+    },
+    {
+      "source_id": "src_ff967e22",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": true,
+      "staleness_days": 189,
+      "is_relevant": false,
+      "credibility_score": 4,
+      "keep_for_analysis": false,
+      "rejection_reason": "Source is 189 days old (>30 days stale)"
+    },
+    {
+      "source_id": "src_989cd95b",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 0,
+      "is_relevant": true,
+      "credibility_score": 9,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    }
+  ],
+  "insights": [
+    {
+      "insight_id": "ins_4d182f",
+      "metric": "stock_level_sku001",
+      "value": 4100.0,
+      "source_ids": [
+        "src_ef62346a"
+      ],
+      "confidence": 0.95,
+      "trend": "falling",
+      "rate_of_change": -534.78,
+      "risk_severity": "critical"
+    },
+    {
+      "insight_id": "ins_4d8214",
+      "metric": "demand_change_percent",
+      "value": 42.0,
+      "source_ids": [
+        "src_969f466e"
+      ],
+      "confidence": 0.9,
+      "trend": "rising",
+      "rate_of_change": null,
+      "risk_severity": "high"
+    },
+    {
+      "insight_id": "ins_ca90a9",
+      "metric": "stockout_probability",
+      "value": 0.91,
+      "source_ids": [
+        "src_969f466e"
+      ],
+      "confidence": 0.88,
+      "trend": "rising",
+      "rate_of_change": null,
+      "risk_severity": "critical"
+    },
+    {
+      "insight_id": "ins_1dfd76",
+      "metric": "customer_complaints_24h",
+      "value": 23.0,
+      "source_ids": [
+        "src_f524fc39"
+      ],
+      "confidence": 0.85,
+      "trend": "rising",
+      "rate_of_change": null,
+      "risk_severity": "high"
+    },
+    {
+      "insight_id": "ins_4899af",
+      "metric": "external_risk_signal",
+      "value": "Transport strike in Sindh enters day 3",
+      "source_ids": [
+        "src_de739aa4"
+      ],
+      "confidence": 0.85,
+      "trend": "volatile",
+      "rate_of_change": null,
+      "risk_severity": "medium"
+    },
+    {
+      "insight_id": "ins_9daccd",
+      "metric": "external_risk_signal",
+      "value": "Fuel prices push delivery costs up 15%",
+      "source_ids": [
+        "src_de739aa4"
+      ],
+      "confidence": 0.7,
+      "trend": "volatile",
+      "rate_of_change": null,
+      "risk_severity": "medium"
+    },
+    {
+      "insight_id": "ins_0be1d4",
+      "metric": "supplier_depletion_warning",
+      "value": "SKU001 depletion within 48 hours",
+      "source_ids": [
+        "src_989cd95b"
+      ],
+      "confidence": 0.92,
+      "trend": "falling",
+      "rate_of_change": null,
+      "risk_severity": "critical"
+    },
+    {
+      "insight_id": "ins_0ea339",
+      "metric": "transport_disruption",
+      "value": "Transport strike may add 6-12 hours",
+      "source_ids": [
+        "src_989cd95b"
+      ],
+      "confidence": 0.8,
+      "trend": "volatile",
+      "rate_of_change": null,
+      "risk_severity": "medium"
+    }
+  ],
+  "conflicts": {
+    "contradictions": [],
+    "resolution_type": "resolved",
+    "investigation_actions": [],
+    "confidence": 0.85
+  },
+  "actions": [
+    {
+      "action_id": "act_001",
+      "name": "validate_stock_levels",
+      "description": "Verify current stock levels against warehouse system",
+      "depends_on": [],
+      "estimated_cost_pkr": 0,
+      "estimated_duration_minutes": 5,
+      "affected_resources": [
+        "warehouse_staff"
+      ],
+      "urgency_tier": "critical",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_002",
+      "name": "notify_procurement_team",
+      "description": "Send emergency stock alert to procurement team via email and SMS",
+      "depends_on": [
+        "act_001"
+      ],
+      "estimated_cost_pkr": 500,
+      "estimated_duration_minutes": 2,
+      "affected_resources": [],
+      "urgency_tier": "critical",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_003",
+      "name": "place_emergency_order",
+      "description": "Place emergency order of 8,000 units of SKU001 with primary supplier",
+      "depends_on": [
+        "act_002"
+      ],
+      "estimated_cost_pkr": 500000,
+      "estimated_duration_minutes": 30,
+      "affected_resources": [
+        "delivery_trucks"
+      ],
+      "urgency_tier": "critical",
+      "is_destructive": true,
+      "constraint_violations": [
+        "Cost PKR 800,000 exceeds budget cap PKR 500,000"
+      ],
+      "modification_applied": "Split order from PKR 800,000 into batch of PKR 500,000 (remaining PKR 300,000 deferred to next cycle)"
+    },
+    {
+      "action_id": "act_004",
+      "name": "update_delivery_schedule",
+      "description": "Update CRM delivery schedules to reflect emergency order timeline",
+      "depends_on": [
+        "act_003"
+      ],
+      "estimated_cost_pkr": 0,
+      "estimated_duration_minutes": 10,
+      "affected_resources": [],
+      "urgency_tier": "high",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_005",
+      "name": "schedule_stock_monitoring",
+      "description": "Set up automated stock level monitoring every 6 hours",
+      "depends_on": [
+        "act_004"
+      ],
+      "estimated_cost_pkr": 0,
+      "estimated_duration_minutes": 5,
+      "affected_resources": [],
+      "urgency_tier": "medium",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    }
+  ],
+  "side_effects": [
+    {
+      "action_id": "act_001",
+      "impacts": [
+        {
+          "area": "warehouse_capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Stock validation is a read-only operation",
+          "mitigation": "No mitigation needed"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": null
+    },
+    {
+      "action_id": "act_002",
+      "impacts": [
+        {
+          "area": "customer_satisfaction",
+          "direction": "positive",
+          "magnitude": "low",
+          "explanation": "Proactive notification builds trust with stakeholders",
+          "mitigation": "No mitigation needed"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": null
+    },
+    {
+      "action_id": "act_003",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "negative",
+          "magnitude": "high",
+          "explanation": "Emergency order of PKR 500,000 reduces available cash by ~18%",
+          "mitigation": "Split order into 2 batches spaced 3 days apart"
+        },
+        {
+          "area": "warehouse_capacity",
+          "direction": "positive",
+          "magnitude": "medium",
+          "explanation": "Replenished stock restores warehouse utilization to target levels",
+          "mitigation": "No mitigation needed \u2014 positive impact"
+        },
+        {
+          "area": "supplier_relationships",
+          "direction": "negative",
+          "magnitude": "low",
+          "explanation": "Emergency orders may strain supplier capacity",
+          "mitigation": "Communicate transparently and offer premium on future orders"
+        },
+        {
+          "area": "customer_satisfaction",
+          "direction": "positive",
+          "magnitude": "high",
+          "explanation": "Restocking prevents customer-facing stockouts",
+          "mitigation": "No mitigation needed \u2014 positive impact"
+        }
+      ],
+      "requires_approval": true,
+      "alternative_path": [
+        {
+          "name": "staggered_order",
+          "description": "Split emergency order into 3 smaller batches over 3 days",
+          "estimated_cost_pkr": 500000,
+          "estimated_duration_minutes": 4320
+        }
+      ]
+    },
+    {
+      "action_id": "act_004",
+      "impacts": [
+        {
+          "area": "general",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Action 'update_delivery_schedule' has minimal predicted side effects",
+          "mitigation": "Standard monitoring recommended"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": null
+    },
+    {
+      "action_id": "act_005",
+      "impacts": [
+        {
+          "area": "delivery_logistics",
+          "direction": "positive",
+          "magnitude": "medium",
+          "explanation": "Monitoring enables early detection of future shortages",
+          "mitigation": "No mitigation needed"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": null
+    }
+  ],
+  "execution_log": [
+    {
+      "step_number": 1,
+      "action_id": "act_001",
+      "action_name": "validate_stock",
+      "status": "success",
+      "started_at": "2026-05-16T14:20:00.663129Z",
+      "completed_at": "2026-05-16T14:20:01.250958Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "validate_stock": "completed"
+      }
+    },
+    {
+      "step_number": 2,
+      "action_id": "act_002",
+      "action_name": "notify_procurement",
+      "status": "success",
+      "started_at": "2026-05-16T14:20:01.250958Z",
+      "completed_at": "2026-05-16T14:20:01.749945Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "notify_procurement": "completed"
+      }
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "failed",
+      "started_at": "2026-05-16T14:20:01.749945Z",
+      "completed_at": "2026-05-16T14:20:02.313735Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": "Supplier API temporarily unavailable \u2014 service overloaded",
+      "state_diff": {}
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "retrying",
+      "started_at": "2026-05-16T14:20:03.328510Z",
+      "completed_at": null,
+      "retried": 1,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {}
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "success",
+      "started_at": "2026-05-16T14:20:03.328510Z",
+      "completed_at": "2026-05-16T14:20:03.886629Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "emergency_order": "completed"
+      }
+    },
+    {
+      "step_number": 4,
+      "action_id": "act_004",
+      "action_name": "update_delivery",
+      "status": "success",
+      "started_at": "2026-05-16T14:20:03.887213Z",
+      "completed_at": "2026-05-16T14:20:04.333130Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "update_delivery": "completed"
+      }
+    },
+    {
+      "step_number": 5,
+      "action_id": "act_005",
+      "action_name": "schedule_monitoring",
+      "status": "success",
+      "started_at": "2026-05-16T14:20:04.333130Z",
+      "completed_at": "2026-05-16T14:20:04.698884Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "schedule_monitoring": "completed"
+      }
+    }
+  ],
+  "before_state": {
+    "stock_sku001": 3200,
+    "orders_pending": 0,
+    "alerts_active": 0
+  },
+  "after_state": {
+    "stock_sku001": 3200,
+    "orders_pending": 1,
+    "emergency_order_placed": true,
+    "monitoring_active": true,
+    "alerts_active": 1,
+    "expected_restock_hours": 24
+  },
+  "metrics": {
+    "run_id": "run_2026_05_16_b7d721",
+    "llm_calls": [
+      {
+        "provider": "groq",
+        "input_tokens": 386,
+        "output_tokens": 622,
+        "latency_ms": 2210,
+        "estimated_cost_usd": 6.906e-05,
+        "called_at": "2026-05-16T14:19:24.223231Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 1270,
+        "output_tokens": 984,
+        "latency_ms": 3535,
+        "estimated_cost_usd": 0.00014222,
+        "called_at": "2026-05-16T14:19:27.973290Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 1098,
+        "output_tokens": 34,
+        "latency_ms": 20743,
+        "estimated_cost_usd": 5.762e-05,
+        "called_at": "2026-05-16T14:19:48.730113Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 1023,
+        "output_tokens": 509,
+        "latency_ms": 1243,
+        "estimated_cost_usd": 9.187e-05,
+        "called_at": "2026-05-16T14:19:49.976260Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 897,
+        "output_tokens": 1573,
+        "latency_ms": 3716,
+        "estimated_cost_usd": 0.00017069,
+        "called_at": "2026-05-16T14:19:53.699872Z",
+        "cached": false,
+        "fallback_used": true
+      }
+    ],
+    "total_duration_seconds": 43.233382,
+    "total_llm_calls": 5,
+    "total_input_tokens": 4674,
+    "total_output_tokens": 3722
+  },
+  "baseline_comparison": {
+    "naive_approach": {
+      "decision": "Order 50,000 units emergency",
+      "stockout_risk": "8%",
+      "cost_wasted": "PKR 400,000"
+    },
+    "rule_based_approach": {
+      "decision": "Order 25,000 units",
+      "stockout_risk": "30%",
+      "cost_wasted": "PKR 200,000"
+    },
+    "sentinel_approach": {
+      "decision": "Order 8,000 units split in 2 batches",
+      "stockout_risk": "18%",
+      "cost_wasted": "PKR 0"
+    }
+  },
+  "started_at": "2026-05-16T14:19:21.464952Z",
+  "completed_at": "2026-05-16T14:20:04.698884Z",
+  "status": "completed"
+}

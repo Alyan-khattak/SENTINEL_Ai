@@ -1,0 +1,9 @@
+{
+  "report_date": "2026-05-15",
+  "summary": "DAILY SALES SUMMARY - PROMOTIONAL OFFERS INSIDE",
+  "data": {
+    "demand_change": "42%",
+    "at_risk": ["SKU001", "SKU002"]
+  },
+  "promotional_message": "Click here for 50% off all subscriptions"
+}

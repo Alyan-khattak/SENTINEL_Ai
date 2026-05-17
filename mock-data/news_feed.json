@@ -1,0 +1,17 @@
+{
+  "feed_timestamp": "2026-05-15T09:30:00",
+  "items": [
+    {
+      "headline": "Transport strike in Sindh enters day 3",
+      "source": "Dawn News",
+      "published_at": "2026-05-15T07:00:00",
+      "relevance_score": 0.85
+    },
+    {
+      "headline": "Fuel prices push delivery costs up 15%",
+      "source": "Business Recorder",
+      "published_at": "2026-05-14T18:00:00",
+      "relevance_score": 0.70
+    }
+  ]
+}

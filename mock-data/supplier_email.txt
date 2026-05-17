@@ -1,0 +1,21 @@
+From: ahmed@karachisupplies.pk
+To: procurement@yourcompany.pk
+Date: 2026-05-15
+Subject: URGENT — Stock Depletion Warning for SKU001
+
+Dear Procurement Team,
+
+Based on current dispatch rates analyzed from your warehouse data and our
+delivery schedules, your SKU001 (Cooking Oil 5L) inventory will be fully
+depleted within 48 hours. We strongly recommend placing an emergency order
+of at least 8,000 units immediately to avoid stockout.
+
+Our standard lead time is 24 hours for emergency orders if confirmed before
+6:00 PM today. Transport conditions in Sindh remain affected by the ongoing
+strike, which may add 6-12 hours to delivery.
+
+Please confirm at your earliest convenience.
+
+Regards,
+Ahmed Khan
+Karachi Supplies Pvt Ltd

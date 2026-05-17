@@ -1,0 +1,320 @@
+{
+  "run_id": "run_2026_05_17_f1f60f",
+  "scenario": "conflicts",
+  "work_plan": {
+    "high_level_steps": [
+      "Data Ingestion",
+      "Conflict Detection",
+      "Entity Disambiguation",
+      "Relationship Analysis",
+      "Insight Generation",
+      "Result Validation",
+      "Output Formatting"
+    ],
+    "expected_duration_seconds": 120,
+    "estimated_llm_calls": 10,
+    "fallback_strategy": "If primary approach fails, re-run with adjusted parameters or switch to a rule-based approach."
+  },
+  "task_plan": {
+    "tasks": [
+      {
+        "task_id": "T1",
+        "description": "Ingest custom input data from json source",
+        "depends_on": [],
+        "agent_assigned": "planner",
+        "expected_output_schema": "DataIngestionResult"
+      },
+      {
+        "task_id": "T2",
+        "description": "Detect conflicts in ingested data",
+        "depends_on": [
+          "T1"
+        ],
+        "agent_assigned": "conflict_detector",
+        "expected_output_schema": "ConflictDetectionResult"
+      },
+      {
+        "task_id": "T3",
+        "description": "Perform entity disambiguation on detected conflicts",
+        "depends_on": [
+          "T2"
+        ],
+        "agent_assigned": "entity_disambiguator",
+        "expected_output_schema": "EntityDisambiguationResult"
+      },
+      {
+        "task_id": "T4",
+        "description": "Analyze relationships between disambiguated entities",
+        "depends_on": [
+          "T3"
+        ],
+        "agent_assigned": "relationship_analyzer",
+        "expected_output_schema": "RelationshipAnalysisResult"
+      },
+      {
+        "task_id": "T5",
+        "description": "Generate insights from relationship analysis",
+        "depends_on": [
+          "T4"
+        ],
+        "agent_assigned": "insight_generator",
+        "expected_output_schema": "InsightGenerationResult"
+      },
+      {
+        "task_id": "T6",
+        "description": "Validate generated insights",
+        "depends_on": [
+          "T5"
+        ],
+        "agent_assigned": "result_validator",
+        "expected_output_schema": "ResultValidationResult"
+      },
+      {
+        "task_id": "T7",
+        "description": "Format validated insights for output",
+        "depends_on": [
+          "T6"
+        ],
+        "agent_assigned": "output_formatter",
+        "expected_output_schema": "OutputFormattingResult"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "src_3f52781a",
+      "source_type": "json",
+      "content": "metric,value,timestamp,confidence\nStock Level,15000 units,2026-05-17T09:30:00Z,0.35\nStock Level,3200 units,2026-05-17T09:40:00Z,0.95\nSupplier Lead Time,14 Days,2026-05-17T09:00:00Z,0.90",
+      "metadata": {
+        "file_path": "custom_input_9",
+        "source_type": "json",
+        "content_length": 185
+      },
+      "recorded_at": "2026-05-17T05:05:02.302417Z",
+      "ingested_at": "2026-05-17T05:05:02.302417Z"
+    }
+  ],
+  "noise_assessments": [
+    {
+      "source_id": "src_3f52781a",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 0,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    }
+  ],
+  "insights": [],
+  "conflicts": {
+    "contradictions": [],
+    "resolution_type": "resolved",
+    "investigation_actions": [],
+    "confidence": 1.0
+  },
+  "actions": [],
+  "side_effects": [],
+  "execution_log": [
+    {
+      "step_number": 1,
+      "action_id": "act_001",
+      "action_name": "validate_stock",
+      "status": "success",
+      "started_at": "2026-05-17T05:05:23.429545Z",
+      "completed_at": "2026-05-17T05:05:23.960325Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "validate_stock": "completed"
+      }
+    },
+    {
+      "step_number": 2,
+      "action_id": "act_002",
+      "action_name": "notify_procurement",
+      "status": "success",
+      "started_at": "2026-05-17T05:05:23.961021Z",
+      "completed_at": "2026-05-17T05:05:24.360356Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "notify_procurement": "completed"
+      }
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "failed",
+      "started_at": "2026-05-17T05:05:24.361153Z",
+      "completed_at": "2026-05-17T05:05:24.928561Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": "Supplier API temporarily unavailable \u2014 service overloaded",
+      "state_diff": {}
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "retrying",
+      "started_at": "2026-05-17T05:05:25.923287Z",
+      "completed_at": null,
+      "retried": 1,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {}
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "success",
+      "started_at": "2026-05-17T05:05:25.923287Z",
+      "completed_at": "2026-05-17T05:05:26.489699Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "emergency_order": "completed"
+      }
+    },
+    {
+      "step_number": 4,
+      "action_id": "act_004",
+      "action_name": "update_delivery",
+      "status": "success",
+      "started_at": "2026-05-17T05:05:26.490340Z",
+      "completed_at": "2026-05-17T05:05:26.889490Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "update_delivery": "completed"
+      }
+    },
+    {
+      "step_number": 5,
+      "action_id": "act_005",
+      "action_name": "schedule_monitoring",
+      "status": "success",
+      "started_at": "2026-05-17T05:05:26.890102Z",
+      "completed_at": "2026-05-17T05:05:27.306766Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "schedule_monitoring": "completed"
+      }
+    }
+  ],
+  "before_state": {
+    "Stock Level": "Critically Low (3,200 units)",
+    "Supplier Lead Time": "14 Days",
+    "Delivery Frequency": "Weekly",
+    "Cashflow Impact": "PKR 0 (Baseline)",
+    "Customer Complaints": "High (23 active)",
+    "Stockout Probability": "91%"
+  },
+  "after_state": {
+    "Stock Level": "Optimal (11,200 units)",
+    "Supplier Lead Time": "7 Days (Express)",
+    "Delivery Frequency": "Bi-Weekly",
+    "Cashflow Impact": "-PKR 450,000 (Approved)",
+    "Customer Complaints": "Low (0 active)",
+    "Stockout Probability": "0%"
+  },
+  "metric_descriptions": {
+    "Stock Level": "The quantity of product stored in our warehouse. Low levels lead to empty shelves; optimal levels ensure smooth supply.",
+    "Supplier Lead Time": "The amount of time it takes from placing an order to when it actually arrives at our warehouse.",
+    "Delivery Frequency": "How often shipments are scheduled to arrive. More frequent shipments allow lower holding costs.",
+    "Cashflow Impact": "The immediate cash outlay required to fund this operation, balanced against budget limits.",
+    "Customer Complaints": "Negative feedback recorded from clients regarding stock unavailability or delivery delays.",
+    "Stockout Probability": "The statistical likelihood of completely running out of stock and losing sales."
+  },
+  "summary": "### \ud83d\udc65 LAYPERSON TRANSLATION\nImagine a store with almost empty shelves, and customers getting frustrated because they can't buy what they need. We fixed this by getting more products into the store, getting them there faster, and making sure they arrive more often.\n\n### \ud83d\udcc8 BUSINESS ANALYSIS\nThe executed actions yielded a significant return on investment by reducing stockout probability to 0%, minimizing customer complaints, and optimizing stock levels, thereby ensuring a substantial reduction in potential losses and an improvement in overall customer satisfaction. The approved cashflow impact of -PKR 450,000 was a strategic investment in constraint compliance and risk reduction.\n\n### \ud83d\udd0d CRITICAL OVERVIEW\nThe conflict scenario presented a critical stock level of 3,200 units, with a high stockout probability of 91% and 23 active customer complaints. To mitigate this, actions were executed to optimize stock levels, reduce supplier lead time, and increase delivery frequency. The outcome resulted in an optimal stock level of 11,200 units, a reduced supplier lead time of 7 days, and a significant decrease in customer complaints. The overall resolution led to a substantial reduction in stockout probability and a notable improvement in cashflow impact.",
+  "metrics": {
+    "run_id": "run_2026_05_17_f1f60f",
+    "llm_calls": [
+      {
+        "provider": "groq",
+        "input_tokens": 317,
+        "output_tokens": 509,
+        "latency_ms": 3092,
+        "estimated_cost_usd": 5.657e-05,
+        "called_at": "2026-05-17T05:05:02.301754Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 379,
+        "output_tokens": 358,
+        "latency_ms": 1516,
+        "estimated_cost_usd": 4.759e-05,
+        "called_at": "2026-05-17T05:05:09.406370Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 329,
+        "output_tokens": 34,
+        "latency_ms": 2254,
+        "estimated_cost_usd": 1.917e-05,
+        "called_at": "2026-05-17T05:05:16.539631Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 426,
+        "output_tokens": 510,
+        "latency_ms": 2062,
+        "estimated_cost_usd": 6.21e-05,
+        "called_at": "2026-05-17T05:05:23.427846Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 504,
+        "output_tokens": 552,
+        "latency_ms": 2118,
+        "estimated_cost_usd": 6.936e-05,
+        "called_at": "2026-05-17T05:05:34.284889Z",
+        "cached": false,
+        "fallback_used": true
+      }
+    ],
+    "total_duration_seconds": 42.972266,
+    "total_llm_calls": 5,
+    "total_input_tokens": 1955,
+    "total_output_tokens": 1963
+  },
+  "baseline_comparison": {
+    "naive_approach": {
+      "decision": "Order 50,000 units emergency",
+      "stockout_risk": "8%",
+      "cost_wasted": "PKR 400,000"
+    },
+    "rule_based_approach": {
+      "decision": "Order 25,000 units",
+      "stockout_risk": "30%",
+      "cost_wasted": "PKR 200,000"
+    },
+    "sentinel_approach": {
+      "decision": "Order 8,000 units split in 2 batches",
+      "stockout_risk": "18%",
+      "cost_wasted": "PKR 0"
+    }
+  },
+  "started_at": "2026-05-17T05:04:51.312623Z",
+  "completed_at": "2026-05-17T05:05:34.285424Z",
+  "status": "completed"
+}

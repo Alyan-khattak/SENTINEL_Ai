@@ -1,0 +1,11 @@
+{
+  "report_date": "2026-05-15",
+  "period": "last_7_days",
+  "metrics": {
+    "demand_change_percent": 42,
+    "skus_at_risk": ["SKU001", "SKU002"],
+    "stockout_probability": 0.91,
+    "daily_units_sold": [620, 680, 720, 800, 880, 1050, 1200]
+  },
+  "trend": "rapidly_rising"
+}
