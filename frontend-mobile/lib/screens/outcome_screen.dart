@@ -37,6 +37,27 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
     final original = prov.afterState ?? {};
     if (path == 'executed') return original;
 
+    // Check if the backend returned a dynamic simulated state for this path name
+    if (prov.sideEffects.isNotEmpty) {
+      for (var se in prov.sideEffects) {
+        final alts = se['alternative_path'] as List<dynamic>?;
+        if (alts != null) {
+          for (var alt in alts) {
+            if (alt is Map<String, dynamic> && alt['name'] == path) {
+              final simState = alt['simulated_after_state'];
+              if (simState is Map<String, dynamic>) {
+                final merged = Map<String, dynamic>.from(original);
+                simState.forEach((k, v) {
+                  merged[k] = v.toString();
+                });
+                return merged;
+              }
+            }
+          }
+        }
+      }
+    }
+
     final simulated = Map<String, dynamic>.from(original);
 
     if (path == 'staggered_order') {
@@ -69,7 +90,9 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
       case 'staggered_order': return 'Staggered Order';
       case 'regional_supplier_shift': return 'Karachi Bypass Shift';
       case 'express_shipping': return 'Priority Express Delivery';
-      default: return 'Executed Path';
+      default: 
+        if (path.isEmpty || path == 'executed') return 'Executed Path';
+        return path.replaceAll('_', ' ').split(' ').map((s) => s.isNotEmpty ? s[0].toUpperCase() + s.substring(1) : '').join(' ');
     }
   }
 
@@ -138,6 +161,12 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
       ]);
     }
 
+    final isSimulationValueValid = _selectedSimulationPath == 'executed' || altPaths.any((a) => a['name'] == _selectedSimulationPath);
+    final activeSimulationPath = isSimulationValueValid ? _selectedSimulationPath : 'executed';
+
+    final isCompareValueValid = _comparePath == 'none' || altPaths.any((a) => a['name'] == _comparePath);
+    final activeComparePath = isCompareValueValid ? _comparePath : 'none';
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -186,7 +215,7 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
                   border: Border.all(color: SentinelTheme.cyan.withOpacity(0.3)),
                 ),
                 child: DropdownButton<String>(
-                  value: _selectedSimulationPath,
+                  value: activeSimulationPath,
                   dropdownColor: SentinelTheme.deepNavy,
                   underline: const SizedBox(),
                   style: const TextStyle(color: SentinelTheme.cyan, fontSize: 12, fontWeight: FontWeight.bold),
@@ -199,9 +228,19 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
                   },
                   items: [
                     const DropdownMenuItem(value: 'executed', child: Text('🟢 Executed Path')),
-                    const DropdownMenuItem(value: 'staggered_order', child: Text('🔵 What-If: Staggered')),
-                    const DropdownMenuItem(value: 'regional_supplier_shift', child: Text('🟡 What-If: Bypass Shift')),
-                    const DropdownMenuItem(value: 'express_shipping', child: Text('🔴 What-If: Express')),
+                    ...altPaths.map((alt) {
+                      final name = alt['name']?.toString() ?? 'unknown';
+                      final label = _getAlternativeLabel(name);
+                      
+                      String emoji = '🔵';
+                      if (name == 'regional_supplier_shift' || name.contains('shift')) emoji = '🟡';
+                      if (name == 'express_shipping' || name.contains('express')) emoji = '🔴';
+                      
+                      return DropdownMenuItem(
+                        value: name,
+                        child: Text('$emoji What-If: $label'),
+                      );
+                    }).toList(),
                   ],
                 ),
               ),
@@ -213,8 +252,8 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           if (prov.beforeState != null && prov.afterState != null) ...[
             _stateComparisonCard(
               context,
-              _getSimulatedBefore(prov, _selectedSimulationPath),
-              _getSimulatedAfter(prov, _selectedSimulationPath),
+              _getSimulatedBefore(prov, activeSimulationPath),
+              _getSimulatedAfter(prov, activeSimulationPath),
               prov,
             ),
             const SizedBox(height: 24),
@@ -233,7 +272,7 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
                   border: Border.all(color: SentinelTheme.purple.withOpacity(0.3)),
                 ),
                 child: DropdownButton<String>(
-                  value: _comparePath,
+                  value: activeComparePath,
                   dropdownColor: SentinelTheme.deepNavy,
                   underline: const SizedBox(),
                   style: const TextStyle(color: SentinelTheme.purple, fontSize: 12, fontWeight: FontWeight.bold),
@@ -246,17 +285,22 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
                   },
                   items: [
                     const DropdownMenuItem(value: 'none', child: Text('No Comparison')),
-                    const DropdownMenuItem(value: 'staggered_order', child: Text('vs Staggered Order')),
-                    const DropdownMenuItem(value: 'regional_supplier_shift', child: Text('vs Bypass Shift')),
-                    const DropdownMenuItem(value: 'express_shipping', child: Text('vs Express Shipping')),
+                    ...altPaths.map((alt) {
+                      final name = alt['name']?.toString() ?? 'unknown';
+                      final label = _getAlternativeLabel(name);
+                      return DropdownMenuItem(
+                        value: name,
+                        child: Text('vs $label'),
+                      );
+                    }).toList(),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          if (_comparePath != 'none') ...[
-            _sideBySideComparisonCard(context, prov, _comparePath),
+          if (activeComparePath != 'none') ...[
+            _sideBySideComparisonCard(context, prov, activeComparePath),
             const SizedBox(height: 24),
           ],
 

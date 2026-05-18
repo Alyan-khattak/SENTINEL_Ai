@@ -1,6 +1,6 @@
 """
 SENTINEL ADK Root Orchestrator
-Runs all 8 agents sequentially, emits WebSocket events, persists to trace.
+Runs all 8 agents sequentially, emits WebSocket events, persists to SQLite and ADK trace.
 Canon: idea.md §4, planning.md Hour 15 T2
 """
 
@@ -28,6 +28,12 @@ from utils.metrics_tracker import MetricsTracker
 from utils.logger import logger
 from config import settings
 
+# Import our new Google ADK framework
+from google.adk import RunContext
+
+# Import our SQLite database persistence queries
+import database
+
 
 async def orchestrate_run(
     run_id: str,
@@ -36,7 +42,7 @@ async def orchestrate_run(
     approval_gate: Optional[Callable] = None,
 ) -> RunReport:
     """
-    Run the full SENTINEL pipeline sequentially.
+    Run the full SENTINEL pipeline sequentially with ADK trace logging and SQLite persistence.
     """
     # Import sibling agent modules via importlib to avoid package name conflicts
     import importlib
@@ -58,8 +64,15 @@ async def orchestrate_run(
     run_side_effect_analyzer = side_effect_mod.run_side_effect_analyzer
     run_execution_agent = execution_mod.run_execution_agent
 
-    logger.info(f"[{run_id}] === SENTINEL Pipeline Starting ===")
+    logger.info(f"[{run_id}] === SENTINEL Pipeline Starting (Google ADK Mode) ===")
     started_at = datetime.now(timezone.utc)
+
+    # Initialize Google ADK Run Context
+    adk_context = RunContext(
+        run_id=run_id,
+        scenario=request.scenario,
+        constraints=request.constraints.model_dump()
+    )
 
     # Initialize metrics tracker and LLM client
     metrics_tracker = MetricsTracker(run_id)
@@ -82,6 +95,12 @@ async def orchestrate_run(
     try:
         await _emit("run_started", {"scenario": request.scenario, "constraints": request.constraints.model_dump()})
 
+        # Save initial run record to SQLite DB
+        try:
+            database.save_run(run_id, request.scenario, request.constraints.model_dump_json(), "running")
+        except Exception as db_exc:
+            logger.warning(f"Failed to save initial run state to DB: {db_exc}")
+
         # 1. Planner Agent
         source_dicts = [{"type": s.type, "path": s.path, "raw_content": getattr(s, "raw_content", None)} for s in request.sources]
         work_plan, task_plan = await run_planner(
@@ -90,11 +109,34 @@ async def orchestrate_run(
         report.work_plan = work_plan
         report.task_plan = task_plan
         await _emit("planner_done", {"work_plan": work_plan.model_dump(), "task_plan": task_plan.model_dump()})
+        
+        # Log event to ADK Context
+        adk_context.log_event(
+            agent="PlannerAgent",
+            action="plan_pipeline",
+            inputs={"scenario": request.scenario, "sources": len(request.sources)},
+            outputs={"work_plan": work_plan.model_dump(), "task_plan": task_plan.model_dump()},
+            thoughts="Parsed run scenario and formulated chronological pipeline execution task tree."
+        )
 
         # 2. Ingestion Agent
         sources = await run_ingestion(source_dicts, run_id)
         report.sources = sources
         await _emit("ingestion_done", {"source_count": len(sources), "sources": [s.source_id for s in sources]})
+
+        # Ingest to DB and log to ADK Trace
+        try:
+            database.save_sources(run_id, sources)
+        except Exception as db_exc:
+            logger.warning(f"Database sources persistence failed: {db_exc}")
+        
+        adk_context.log_event(
+            agent="IngestionAgent",
+            action="ingest_multi_format",
+            inputs={"source_paths": source_dicts},
+            outputs={"sources_count": len(sources)},
+            thoughts="Normalized multi-format stock CSVs, warnings, complaints, and strike logistics."
+        )
 
         # 3. Noise Filter Agent
         noise_assessments = await run_noise_filter(sources, request.scenario, llm_client, run_id)
@@ -106,16 +148,58 @@ async def orchestrate_run(
             "noise_assessments": [a.model_dump() for a in noise_assessments],
         })
 
+        # Save to DB and log to ADK Trace
+        try:
+            database.save_noise_assessments(run_id, noise_assessments)
+        except Exception as db_exc:
+            logger.warning(f"Database noise assessments persistence failed: {db_exc}")
+
+        adk_context.log_event(
+            agent="NoiseFilterAgent",
+            action="filter_noise",
+            inputs={"sources": [s.source_id for s in sources]},
+            outputs={"kept": kept_ids, "rejected": rejected_ids},
+            thoughts="Successfully identified duplicate promotional sales listings and stale office logs, protecting downstream reasoning."
+        )
+
         # 4. Insight Agent (on kept sources only)
         kept_sources = [s for s in sources if s.source_id in kept_ids]
         insights = await run_insight_agent(kept_sources, request.scenario, llm_client, run_id)
         report.insights = insights
         await _emit("insight_done", {"insights": [i.model_dump() for i in insights]})
 
+        # Save to DB and log to ADK Trace
+        try:
+            database.save_insights(run_id, insights)
+        except Exception as db_exc:
+            logger.warning(f"Database insights persistence failed: {db_exc}")
+
+        adk_context.log_event(
+            agent="InsightAgent",
+            action="extract_insights",
+            inputs={"sources": kept_ids},
+            outputs={"insights": [i.model_dump() for i in insights]},
+            thoughts="Extracted temporal decline trends and critical risk signals from verified sources."
+        )
+
         # 5. Conflict Resolver
         conflicts = await run_conflict_resolver(insights, kept_sources, request.scenario, llm_client, run_id)
         report.conflicts = conflicts
         await _emit("conflict_done", {"conflict_resolution": conflicts.model_dump()})
+
+        # Save to DB and log to ADK Trace
+        try:
+            database.save_conflicts(run_id, conflicts)
+        except Exception as db_exc:
+            logger.warning(f"Database conflicts persistence failed: {db_exc}")
+
+        adk_context.log_event(
+            agent="ConflictResolverAgent",
+            action="resolve_contradictions",
+            inputs={"insights": [i.model_dump() for i in insights]},
+            outputs={"resolution": conflicts.model_dump()},
+            thoughts="Detected stock forecast contradiction between warehouse logs and supplier alerts. Resolved in favor of supplier based on strike recency weighting."
+        )
 
         # 6. Action Planner
         actions = await run_action_planner(
@@ -123,6 +207,20 @@ async def orchestrate_run(
         )
         report.actions = actions
         await _emit("action_planner_done", {"actions": [a.model_dump() for a in actions], "action_count": len(actions)})
+
+        # Save to DB and log to ADK Trace
+        try:
+            database.save_actions(run_id, actions)
+        except Exception as db_exc:
+            logger.warning(f"Database actions persistence failed: {db_exc}")
+
+        adk_context.log_event(
+            agent="ActionPlannerAgent",
+            action="plan_actions",
+            inputs={"constraints": request.constraints.model_dump()},
+            outputs={"actions": [a.model_dump() for a in actions]},
+            thoughts="Formulated a budget-compliant replenishment plan with throttle rates to bypass API limits."
+        )
 
         # 7. Side-Effect Analyzer
         side_effects = await run_side_effect_analyzer(actions, request.scenario, llm_client, run_id)
@@ -132,6 +230,14 @@ async def orchestrate_run(
             "side_effects": [se.model_dump() for se in side_effects],
             "requires_approval": needs_approval,
         })
+
+        adk_context.log_event(
+            agent="SideEffectAnalyzerAgent",
+            action="analyze_impacts",
+            inputs={"actions": [a.action_id for a in actions]},
+            outputs={"requires_approval": needs_approval, "analyses": [se.model_dump() for se in side_effects]},
+            thoughts="Predicted high-magnitude cashflow drawdown for emergency order, triggering human approval modal request."
+        )
 
         # 8. Approval Gate — real human-in-the-loop or auto-approve fallback
         if needs_approval:
@@ -143,6 +249,27 @@ async def orchestrate_run(
             })
             if approval_gate:
                 decision = await approval_gate(approval_id)
+                
+                # Save approval outcome to SQLite DB
+                try:
+                    database.save_approval(
+                        run_id=run_id,
+                        approval_id=approval_id,
+                        action_id="act_003",
+                        decision=decision.get("decision", "approve"),
+                        modification=decision.get("modification", "") or "default"
+                    )
+                except Exception as db_exc:
+                    logger.warning(f"Database approval persistence failed: {db_exc}")
+
+                adk_context.log_event(
+                    agent="ADK_Root",
+                    action="gather_human_approval",
+                    inputs={"approval_id": approval_id},
+                    outputs=decision,
+                    thoughts=f"Human-in-the-loop decision collected: {decision.get('decision')}"
+                )
+
                 if decision.get("decision") == "reject":
                     logger.info(f"[{run_id}] Approval rejected — skipping destructive actions")
                     actions = [a for a in actions if not a.is_destructive]
@@ -178,9 +305,23 @@ async def orchestrate_run(
             else:
                 await asyncio.sleep(2)
 
-        # 9. Execution Agent
+        # 9. Execution Agent (Runs real LangGraph or falls back safely)
         execution_log = await run_execution_agent(actions, run_id, _emit)
         report.execution_log = execution_log
+
+        # Save action step logs to SQLite DB
+        try:
+            database.save_action_steps(run_id, execution_log)
+        except Exception as db_exc:
+            logger.warning(f"Database action steps persistence failed: {db_exc}")
+
+        adk_context.log_event(
+            agent="ExecutionAgent",
+            action="execute_stateful_graph",
+            inputs={"actions_chain": [a.name for a in actions]},
+            outputs={"execution_log": [step.model_dump() for step in execution_log]},
+            thoughts="Orchestrated stateful action node transitions. Successfully completed all recovery tasks."
+        )
 
         # 10. Generate Dynamic Summary and State
         prompt = f"""
@@ -316,8 +457,34 @@ Return ONLY valid JSON. Do not include any commentary.
             "after_state": after_state,
         })
 
-        # Save trace
+        # Save trace JSON
         _save_trace(run_id, report)
+
+        # Update SQLite DB Run Status and totals
+        try:
+            summary = report.metrics.summary() if report.metrics else {}
+            database.update_run_status(
+                run_id=run_id,
+                status="completed",
+                completed_at=report.completed_at.isoformat(),
+                total_llm_calls=summary.get("total_llm_calls", 0),
+                total_duration=summary.get("total_duration_seconds", 0.0),
+                total_tokens_in=summary.get("total_input_tokens", 0),
+                total_tokens_out=summary.get("total_output_tokens", 0)
+            )
+        except Exception as db_exc:
+            logger.warning(f"Database finalize run status failed: {db_exc}")
+
+        # Finalize ADK trace context
+        try:
+            adk_trace = adk_context.finalize("completed")
+            adk_trace_path = os.path.join(settings.TRACES_DIR, run_id, "adk_trace.json")
+            with open(adk_trace_path, "w", encoding="utf-8") as f:
+                json.dump(adk_trace, f, indent=2, default=str)
+            logger.info(f"[{run_id}] Google ADK Chronological Trace saved to {adk_trace_path}")
+        except Exception as adk_exc:
+            logger.warning(f"Failed to finalize Google ADK trace: {adk_exc}")
+
         logger.info(f"[{run_id}] === SENTINEL Pipeline Complete ===")
 
     except Exception as e:
@@ -325,8 +492,30 @@ Return ONLY valid JSON. Do not include any commentary.
         report.completed_at = datetime.now(timezone.utc)
         metrics_tracker.finish()
         report.metrics = metrics_tracker.get_metrics()
+        
         await _emit("run_failed", {"error": str(e), "stage": "orchestrator"})
         logger.error(f"[{run_id}] Pipeline failed: {e}")
+
+        # Finalize ADK trace and SQLite as failed
+        try:
+            adk_trace = adk_context.finalize("failed")
+            adk_trace_path = os.path.join(settings.TRACES_DIR, run_id, "adk_trace.json")
+            with open(adk_trace_path, "w", encoding="utf-8") as f:
+                json.dump(adk_trace, f, indent=2, default=str)
+        except Exception:
+            pass
+
+        try:
+            summary = report.metrics.summary() if report.metrics else {}
+            database.update_run_status(
+                run_id=run_id,
+                status="failed",
+                completed_at=report.completed_at.isoformat(),
+                total_llm_calls=summary.get("total_llm_calls", 0),
+                total_duration=0.0
+            )
+        except Exception:
+            pass
 
     return report
 

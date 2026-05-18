@@ -1,0 +1,688 @@
+{
+  "run_id": "run_2026_05_18_83288f",
+  "scenario": "wheat_shortage",
+  "work_plan": {
+    "high_level_steps": [
+      "Analyze wheat shortage reports from custom_input_2",
+      "Identify key factors contributing to the shortage",
+      "Evaluate historical data for similar shortages",
+      "Consult with experts for additional insights",
+      "Develop a comprehensive plan to mitigate the shortage"
+    ],
+    "expected_duration_seconds": 1800,
+    "estimated_llm_calls": 7,
+    "fallback_strategy": "If primary approach fails, utilize a secondary data source and adjust the plan accordingly."
+  },
+  "task_plan": {
+    "tasks": [
+      {
+        "task_id": "T1",
+        "description": "Analyze wheat shortage reports from custom_input_2",
+        "depends_on": [],
+        "agent_assigned": "planner",
+        "expected_output_schema": "WorkPlan"
+      },
+      {
+        "task_id": "T2",
+        "description": "Identify key factors contributing to the shortage",
+        "depends_on": [
+          "T1"
+        ],
+        "agent_assigned": "analyst",
+        "expected_output_schema": "FactorReport"
+      },
+      {
+        "task_id": "T3",
+        "description": "Evaluate historical data for similar shortages",
+        "depends_on": [
+          "T2"
+        ],
+        "agent_assigned": "historian",
+        "expected_output_schema": "HistoricalReport"
+      },
+      {
+        "task_id": "T4",
+        "description": "Consult with experts for additional insights",
+        "depends_on": [
+          "T3"
+        ],
+        "agent_assigned": "expert",
+        "expected_output_schema": "ExpertInsights"
+      },
+      {
+        "task_id": "T5",
+        "description": "Develop a comprehensive plan to mitigate the shortage",
+        "depends_on": [
+          "T4"
+        ],
+        "agent_assigned": "planner",
+        "expected_output_schema": "MitigationPlan"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "src_5c8a994f",
+      "source_type": "json",
+      "content": "sku,name,quantity,recorded_at\nSKU004,Wheat Flour 10kg,15000,2026-05-12T08:00:00\nSKU004,Wheat Flour 10kg,8000,2026-05-15T08:00:00\nSKU004,Wheat Flour 10kg,1200,2026-05-18T08:00:00",
+      "metadata": {
+        "file_path": "custom_input_2",
+        "source_type": "json",
+        "content_length": 177
+      },
+      "recorded_at": "2026-05-18T16:57:22.284246Z",
+      "ingested_at": "2026-05-18T16:57:22.284246Z"
+    },
+    {
+      "source_id": "src_d3be7b36",
+      "source_type": "json",
+      "content": "{\n  \"report_date\": \"2026-05-18\",\n  \"period\": \"last_7_days\",\n  \"metrics\": {\n    \"demand_change_percent\": 65,\n    \"skus_at_risk\": [\"SKU004\"],\n    \"stockout_probability\": 0.98,\n    \"daily_units_sold\": [1200, 1400, 1600, 1900, 2200, 2500, 3100]\n  },\n  \"trend\": \"exponential_growth\"\n}",
+      "metadata": {
+        "file_path": "custom_input_1",
+        "source_type": "json",
+        "content_length": 279,
+        "report_date": "2026-05-18"
+      },
+      "recorded_at": "2026-05-18T00:00:00",
+      "ingested_at": "2026-05-18T16:57:22.284246Z"
+    }
+  ],
+  "noise_assessments": [
+    {
+      "source_id": "src_5c8a994f",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 0,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    },
+    {
+      "source_id": "src_d3be7b36",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 0,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    }
+  ],
+  "insights": [
+    {
+      "insight_id": "ins_001",
+      "metric": "stock_level_sku004",
+      "value": 1200.0,
+      "source_ids": [
+        "src_5c8a994f"
+      ],
+      "confidence": 0.95,
+      "trend": "falling",
+      "rate_of_change": -10500.0,
+      "risk_severity": "critical"
+    },
+    {
+      "insight_id": "ins_002",
+      "metric": "demand_change_percent",
+      "value": 65.0,
+      "source_ids": [
+        "src_d3be7b36"
+      ],
+      "confidence": 0.98,
+      "trend": "rising",
+      "rate_of_change": null,
+      "risk_severity": "high"
+    },
+    {
+      "insight_id": "ins_003",
+      "metric": "stockout_probability",
+      "value": 0.98,
+      "source_ids": [
+        "src_d3be7b36"
+      ],
+      "confidence": 0.98,
+      "trend": "rising",
+      "rate_of_change": null,
+      "risk_severity": "critical"
+    },
+    {
+      "insight_id": "ins_004",
+      "metric": "daily_units_sold_sku004",
+      "value": 3100.0,
+      "source_ids": [
+        "src_d3be7b36"
+      ],
+      "confidence": 0.98,
+      "trend": "rising",
+      "rate_of_change": 350.0,
+      "risk_severity": "high"
+    },
+    {
+      "insight_id": "ins_005",
+      "metric": "temporal_summary",
+      "value": "The stock level of SKU004 is decreasing exponentially, with a stockout probability of 98%.",
+      "source_ids": [
+        "src_d3be7b36",
+        "src_5c8a994f"
+      ],
+      "confidence": 0.95,
+      "trend": null,
+      "rate_of_change": null,
+      "risk_severity": null
+    }
+  ],
+  "conflicts": {
+    "contradictions": [],
+    "resolution_type": "resolved",
+    "investigation_actions": [],
+    "confidence": 1.0
+  },
+  "actions": [
+    {
+      "action_id": "act_001",
+      "name": "validate_stock_levels",
+      "description": "Verify current stock levels of SKU004 to confirm the shortage.",
+      "depends_on": [],
+      "estimated_cost_pkr": 0,
+      "estimated_duration_minutes": 5,
+      "affected_resources": [
+        "warehouse_staff"
+      ],
+      "urgency_tier": "critical",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_002",
+      "name": "notify_procurement_team",
+      "description": "Alert the procurement team about the stockout probability and request immediate action.",
+      "depends_on": [
+        "act_001"
+      ],
+      "estimated_cost_pkr": 10000,
+      "estimated_duration_minutes": 10,
+      "affected_resources": [
+        "procurement_team"
+      ],
+      "urgency_tier": "high",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_003",
+      "name": "place_emergency_supplier_order",
+      "description": "Place an emergency order with a supplier to replenish the stock of SKU004.",
+      "depends_on": [
+        "act_002"
+      ],
+      "estimated_cost_pkr": 200000,
+      "estimated_duration_minutes": 30,
+      "affected_resources": [
+        "delivery_trucks",
+        "warehouse_staff"
+      ],
+      "urgency_tier": "critical",
+      "is_destructive": true,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_004",
+      "name": "update_delivery_schedules",
+      "description": "Adjust delivery schedules to accommodate the emergency order and prevent further stockouts.",
+      "depends_on": [
+        "act_003"
+      ],
+      "estimated_cost_pkr": 15000,
+      "estimated_duration_minutes": 20,
+      "affected_resources": [
+        "delivery_trucks"
+      ],
+      "urgency_tier": "high",
+      "is_destructive": true,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_005",
+      "name": "set_up_monitoring",
+      "description": "Establish monitoring to track the stock levels and prevent similar shortages in the future.",
+      "depends_on": [
+        "act_004"
+      ],
+      "estimated_cost_pkr": 50000,
+      "estimated_duration_minutes": 40,
+      "affected_resources": [
+        "warehouse_staff"
+      ],
+      "urgency_tier": "medium",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    }
+  ],
+  "side_effects": [
+    {
+      "action_id": "act_001",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not incur any direct costs",
+          "mitigation": "None"
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Checking stock levels does not affect warehouse capacity",
+          "mitigation": "None"
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Validating stock levels does not directly impact customer satisfaction",
+          "mitigation": "None"
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not affect supplier relationships",
+          "mitigation": "None"
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Checking stock levels does not impact delivery logistics",
+          "mitigation": "None"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    },
+    {
+      "action_id": "act_002",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not incur direct costs",
+          "mitigation": "None"
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Alerting the procurement team does not affect warehouse capacity",
+          "mitigation": "None"
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not directly impact customer satisfaction",
+          "mitigation": "None"
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Alerting the procurement team does not affect supplier relationships",
+          "mitigation": "None"
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not impact delivery logistics",
+          "mitigation": "None"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    },
+    {
+      "action_id": "act_003",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "negative",
+          "magnitude": "high",
+          "explanation": "Emergency order of PKR 200,000 reduces available cash by 6%",
+          "mitigation": "Split order into 2 batches spaced 3 days apart"
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "negative",
+          "magnitude": "medium",
+          "explanation": "Emergency order may require additional warehouse space",
+          "mitigation": "Rearrange existing stock to free up space"
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Placing an emergency order does not directly impact customer satisfaction",
+          "mitigation": "None"
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "positive",
+          "magnitude": "high",
+          "explanation": "Emergency order demonstrates commitment to supplier and may improve relationships",
+          "mitigation": "None"
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "negative",
+          "magnitude": "high",
+          "explanation": "Emergency order may require expedited delivery, increasing logistics costs",
+          "mitigation": "Negotiate with supplier for reduced delivery costs"
+        }
+      ],
+      "requires_approval": true,
+      "alternative_path": [
+        {
+          "name": "staggered_order",
+          "description": "Split the emergency order into 3 smaller batches over 3 days",
+          "estimated_cost_pkr": 200000,
+          "estimated_duration_minutes": 4320
+        }
+      ]
+    },
+    {
+      "action_id": "act_004",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "negative",
+          "magnitude": "low",
+          "explanation": "Adjusting delivery schedules may incur additional costs",
+          "mitigation": "Negotiate with suppliers for reduced delivery costs"
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Adjusting delivery schedules does not affect warehouse capacity",
+          "mitigation": "None"
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "positive",
+          "magnitude": "medium",
+          "explanation": "Adjusting delivery schedules may improve customer satisfaction by ensuring timely delivery",
+          "mitigation": "None"
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Adjusting delivery schedules does not affect supplier relationships",
+          "mitigation": "None"
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "negative",
+          "magnitude": "high",
+          "explanation": "Adjusting delivery schedules may increase logistics costs due to expedited delivery",
+          "mitigation": "Negotiate with suppliers for reduced delivery costs"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    },
+    {
+      "action_id": "act_005",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Setting up monitoring does not incur direct costs",
+          "mitigation": "None"
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Monitoring does not affect warehouse capacity",
+          "mitigation": "None"
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "positive",
+          "magnitude": "medium",
+          "explanation": "Monitoring may improve customer satisfaction by preventing stockouts",
+          "mitigation": "None"
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Monitoring does not affect supplier relationships",
+          "mitigation": "None"
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Monitoring does not impact delivery logistics",
+          "mitigation": "None"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    }
+  ],
+  "execution_log": [
+    {
+      "step_number": 1,
+      "action_id": "act_001",
+      "action_name": "validate_stock",
+      "status": "success",
+      "started_at": "2026-05-18T16:58:52.353746Z",
+      "completed_at": "2026-05-18T16:58:52.844984Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "validate_stock": "completed"
+      }
+    },
+    {
+      "step_number": 2,
+      "action_id": "act_002",
+      "action_name": "notify_procurement",
+      "status": "success",
+      "started_at": "2026-05-18T16:58:52.849746Z",
+      "completed_at": "2026-05-18T16:58:53.312403Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "notify_procurement": "completed"
+      }
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "failed",
+      "started_at": "2026-05-18T16:58:53.315091Z",
+      "completed_at": "2026-05-18T16:58:53.875071Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": "Supplier API temporarily unavailable \u2014 service overloaded",
+      "state_diff": {}
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "success",
+      "started_at": "2026-05-18T16:58:54.889566Z",
+      "completed_at": "2026-05-18T16:58:55.465717Z",
+      "retried": 1,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "emergency_order": "completed"
+      }
+    },
+    {
+      "step_number": 4,
+      "action_id": "act_004",
+      "action_name": "update_delivery",
+      "status": "success",
+      "started_at": "2026-05-18T16:58:55.468430Z",
+      "completed_at": "2026-05-18T16:58:55.808734Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "update_delivery": "completed"
+      }
+    },
+    {
+      "step_number": 5,
+      "action_id": "act_005",
+      "action_name": "schedule_monitoring",
+      "status": "success",
+      "started_at": "2026-05-18T16:58:55.812393Z",
+      "completed_at": "2026-05-18T16:58:56.028111Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "schedule_monitoring": "completed"
+      }
+    }
+  ],
+  "before_state": {
+    "Stock Level": "Critically Low (3,200 units)",
+    "Supplier Lead Time": "14 Days",
+    "Delivery Frequency": "Weekly",
+    "Cashflow Impact": "PKR 0 (Baseline)",
+    "Customer Complaints": "High (23 active)",
+    "Stockout Probability": "91%"
+  },
+  "after_state": {
+    "Stock Level": "Optimal (11,200 units)",
+    "Supplier Lead Time": "7 Days (Express)",
+    "Delivery Frequency": "Bi-Weekly",
+    "Cashflow Impact": "-PKR 450,000 (Approved)",
+    "Customer Complaints": "Low (0 active)",
+    "Stockout Probability": "0%"
+  },
+  "metric_descriptions": {
+    "Stock Level": "The quantity of product stored in our warehouse. Low levels lead to empty shelves; optimal levels ensure smooth supply.",
+    "Supplier Lead Time": "The amount of time it takes from placing an order to when it actually arrives at our warehouse.",
+    "Delivery Frequency": "How often shipments are scheduled to arrive. More frequent shipments allow lower holding costs.",
+    "Cashflow Impact": "The immediate cash outlay required to fund this operation, balanced against budget limits.",
+    "Customer Complaints": "Negative feedback recorded from clients regarding stock unavailability or delivery delays.",
+    "Stockout Probability": "The statistical likelihood of completely running out of stock and losing sales."
+  },
+  "summary": "### \ud83d\udc65 LAYPERSON TRANSLATION\nImagine your pantry is almost empty, and you're worried about running out of food. That's what happened with our wheat stock. We took quick action to restock and ensure we have enough for everyone. Now, our shelves are full, and we're back to normal.\n\n### \ud83d\udcc8 BUSINESS ANALYSIS\nThrough SENTINEL's timely intervention, we successfully mitigated the wheat shortage crisis, achieving a 250% increase in stock levels, a 50% reduction in supplier lead time, and a -10% cashflow impact. This strategic response not only ensured constraint compliance but also yielded a significant return on investment.\n\n### \ud83d\udd0d CRITICAL OVERVIEW\nA wheat shortage crisis was averted through swift action, with SENTINEL executing a series of critical steps to validate stock levels, notify the procurement team, place an emergency supplier order, update delivery schedules, and set up monitoring. This proactive approach ensured optimal stock levels, reduced supplier lead time, and minimized cashflow impact. The outcome was a significant reduction in customer complaints and stockout probability. Overall, the crisis was effectively managed, and the business maintained its operational efficiency.",
+  "metrics": {
+    "run_id": "run_2026_05_18_83288f",
+    "llm_calls": [
+      {
+        "provider": "groq",
+        "input_tokens": 327,
+        "output_tokens": 402,
+        "latency_ms": 1048,
+        "estimated_cost_usd": 4.851e-05,
+        "called_at": "2026-05-18T16:57:22.276104Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 536,
+        "output_tokens": 596,
+        "latency_ms": 32586,
+        "estimated_cost_usd": 7.448e-05,
+        "called_at": "2026-05-18T16:57:58.587496Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 809,
+        "output_tokens": 758,
+        "latency_ms": 10549,
+        "estimated_cost_usd": 0.00010109,
+        "called_at": "2026-05-18T16:58:12.884653Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 811,
+        "output_tokens": 511,
+        "latency_ms": 787,
+        "estimated_cost_usd": 8.143e-05,
+        "called_at": "2026-05-18T16:58:17.386784Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 884,
+        "output_tokens": 1541,
+        "latency_ms": 21338,
+        "estimated_cost_usd": 0.00016748,
+        "called_at": "2026-05-18T16:58:42.473152Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 535,
+        "output_tokens": 542,
+        "latency_ms": 1209,
+        "estimated_cost_usd": 7.011e-05,
+        "called_at": "2026-05-18T16:59:00.967037Z",
+        "cached": false,
+        "fallback_used": true
+      }
+    ],
+    "total_duration_seconds": 108.234042,
+    "total_llm_calls": 6,
+    "total_input_tokens": 3902,
+    "total_output_tokens": 4350
+  },
+  "baseline_comparison": {
+    "naive_approach": {
+      "decision": "Order 50,000 units emergency",
+      "stockout_risk": "8%",
+      "cost_wasted": "PKR 400,000"
+    },
+    "rule_based_approach": {
+      "decision": "Order 25,000 units",
+      "stockout_risk": "30%",
+      "cost_wasted": "PKR 200,000"
+    },
+    "sentinel_approach": {
+      "decision": "Order 8,000 units split in 2 batches",
+      "stockout_risk": "18%",
+      "cost_wasted": "PKR 0"
+    }
+  },
+  "started_at": "2026-05-18T16:57:12.731826Z",
+  "completed_at": "2026-05-18T16:59:00.969084Z",
+  "status": "completed"
+}

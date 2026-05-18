@@ -1,0 +1,659 @@
+{
+  "run_id": "run_2026_05_18_affe0e",
+  "scenario": "inventory_shortage",
+  "started_at": "2026-05-18T15:47:43.648913+00:00",
+  "completed_at": "2026-05-18T15:48:48.166508+00:00",
+  "status": "completed",
+  "trace_events": [
+    {
+      "timestamp": "2026-05-18T15:47:43.648913+00:00",
+      "agent": "ADK_Root",
+      "action": "initialize_run",
+      "inputs": {
+        "scenario": "inventory_shortage",
+        "constraints": {
+          "budget_pkr_max": 500000,
+          "time_to_resolution_hours_max": 48,
+          "notification_deadline_hours_max": 2,
+          "api_rate_limit_per_minute": 10,
+          "resource_constraints": {
+            "warehouse_staff": 3,
+            "delivery_trucks": 5
+          }
+        }
+      },
+      "outputs": {
+        "status": "running"
+      },
+      "thoughts": "Initialized RunContext. Setting up agent pipeline sequentially."
+    },
+    {
+      "timestamp": "2026-05-18T15:47:44.322770+00:00",
+      "agent": "PlannerAgent",
+      "action": "plan_pipeline",
+      "inputs": {
+        "scenario": "inventory_shortage",
+        "sources": 7
+      },
+      "outputs": {
+        "work_plan": {
+          "high_level_steps": [
+            "Read and preprocess input sources",
+            "Identify and filter relevant data",
+            "Analyze inventory shortage using LLM",
+            "Evaluate supplier email for potential causes",
+            "Determine root cause and propose solution",
+            "Generate report and alert stakeholders"
+          ],
+          "expected_duration_seconds": 300,
+          "estimated_llm_calls": 7,
+          "fallback_strategy": "If primary approach fails, use manual analysis and expert judgment to determine root cause and propose solution."
+        },
+        "task_plan": {
+          "tasks": [
+            {
+              "task_id": "T1",
+              "description": "Read and preprocess input sources (csv, json, pdf)",
+              "depends_on": [],
+              "agent_assigned": "data_preprocessor",
+              "expected_output_schema": "PreprocessedData"
+            },
+            {
+              "task_id": "T2",
+              "description": "Identify and filter relevant data from preprocessed sources",
+              "depends_on": [
+                "T1"
+              ],
+              "agent_assigned": "data_filter",
+              "expected_output_schema": "FilteredData"
+            },
+            {
+              "task_id": "T3",
+              "description": "Analyze inventory shortage using LLM",
+              "depends_on": [
+                "T2"
+              ],
+              "agent_assigned": "planner",
+              "expected_output_schema": "AnalysisResult"
+            },
+            {
+              "task_id": "T4",
+              "description": "Evaluate supplier email for potential causes",
+              "depends_on": [
+                "T3"
+              ],
+              "agent_assigned": "planner",
+              "expected_output_schema": "SupplierEmailAnalysis"
+            },
+            {
+              "task_id": "T5",
+              "description": "Determine root cause and propose solution",
+              "depends_on": [
+                "T3",
+                "T4"
+              ],
+              "agent_assigned": "planner",
+              "expected_output_schema": "RootCauseAnalysis"
+            },
+            {
+              "task_id": "T6",
+              "description": "Generate report and alert stakeholders",
+              "depends_on": [
+                "T5"
+              ],
+              "agent_assigned": "report_generator",
+              "expected_output_schema": "Report"
+            }
+          ]
+        }
+      },
+      "thoughts": "Parsed run scenario and formulated chronological pipeline execution task tree."
+    },
+    {
+      "timestamp": "2026-05-18T15:47:44.559441+00:00",
+      "agent": "IngestionAgent",
+      "action": "ingest_multi_format",
+      "inputs": {
+        "source_paths": [
+          {
+            "type": "csv",
+            "path": "mock-data/warehouse_stock_7days.csv",
+            "raw_content": null
+          },
+          {
+            "type": "json",
+            "path": "mock-data/sales_dashboard.json",
+            "raw_content": null
+          },
+          {
+            "type": "json",
+            "path": "mock-data/complaints.json",
+            "raw_content": null
+          },
+          {
+            "type": "json",
+            "path": "mock-data/news_feed.json",
+            "raw_content": null
+          },
+          {
+            "type": "pdf",
+            "path": "mock-data/supplier_email.pdf",
+            "raw_content": null
+          },
+          {
+            "type": "json",
+            "path": "mock-data/duplicate_spam_source.json",
+            "raw_content": null
+          },
+          {
+            "type": "json",
+            "path": "mock-data/stale_irrelevant_source.json",
+            "raw_content": null
+          }
+        ]
+      },
+      "outputs": {
+        "sources_count": 7
+      },
+      "thoughts": "Normalized multi-format stock CSVs, warnings, complaints, and strike logistics."
+    },
+    {
+      "timestamp": "2026-05-18T15:47:53.788164+00:00",
+      "agent": "NoiseFilterAgent",
+      "action": "filter_noise",
+      "inputs": {
+        "sources": [
+          "src_37b5348b",
+          "src_2336ce3c",
+          "src_bbe66286",
+          "src_ebf049f3",
+          "src_bf5d148e",
+          "src_dfb25fda",
+          "src_4ae7d070"
+        ]
+      },
+      "outputs": {
+        "kept": [
+          "src_37b5348b",
+          "src_2336ce3c",
+          "src_bbe66286",
+          "src_ebf049f3",
+          "src_bf5d148e"
+        ],
+        "rejected": [
+          "src_dfb25fda",
+          "src_4ae7d070"
+        ]
+      },
+      "thoughts": "Successfully identified duplicate promotional sales listings and stale office logs, protecting downstream reasoning."
+    },
+    {
+      "timestamp": "2026-05-18T15:48:03.750835+00:00",
+      "agent": "InsightAgent",
+      "action": "extract_insights",
+      "inputs": {
+        "sources": [
+          "src_37b5348b",
+          "src_2336ce3c",
+          "src_bbe66286",
+          "src_ebf049f3",
+          "src_bf5d148e"
+        ]
+      },
+      "outputs": {
+        "insights": [
+          {
+            "insight_id": "ins_001",
+            "metric": "stock_level_sku001",
+            "value": "3,200 units remaining (Cooking Oil 5L)",
+            "source_ids": [
+              "src_warehouse_01"
+            ],
+            "confidence": 0.95,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_002",
+            "metric": "stockout_time_sku001",
+            "value": "Depletion within 48 hours",
+            "source_ids": [
+              "src_supplier_01"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": 0.0,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_003",
+            "metric": "demand_change_percent",
+            "value": "+42% demand increase over trailing 7 days",
+            "source_ids": [
+              "src_sales_01"
+            ],
+            "confidence": 0.89,
+            "trend": "rising",
+            "rate_of_change": 6.0,
+            "risk_severity": "high"
+          },
+          {
+            "insight_id": "ins_004",
+            "metric": "delivery_logistics",
+            "value": "Sindh strike blocks critical transport corridors",
+            "source_ids": [
+              "src_news_01"
+            ],
+            "confidence": 0.85,
+            "trend": "volatile",
+            "rate_of_change": 0.0,
+            "risk_severity": "high"
+          }
+        ]
+      },
+      "thoughts": "Extracted temporal decline trends and critical risk signals from verified sources."
+    },
+    {
+      "timestamp": "2026-05-18T15:48:11.164097+00:00",
+      "agent": "ConflictResolverAgent",
+      "action": "resolve_contradictions",
+      "inputs": {
+        "insights": [
+          {
+            "insight_id": "ins_001",
+            "metric": "stock_level_sku001",
+            "value": "3,200 units remaining (Cooking Oil 5L)",
+            "source_ids": [
+              "src_warehouse_01"
+            ],
+            "confidence": 0.95,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_002",
+            "metric": "stockout_time_sku001",
+            "value": "Depletion within 48 hours",
+            "source_ids": [
+              "src_supplier_01"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": 0.0,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_003",
+            "metric": "demand_change_percent",
+            "value": "+42% demand increase over trailing 7 days",
+            "source_ids": [
+              "src_sales_01"
+            ],
+            "confidence": 0.89,
+            "trend": "rising",
+            "rate_of_change": 6.0,
+            "risk_severity": "high"
+          },
+          {
+            "insight_id": "ins_004",
+            "metric": "delivery_logistics",
+            "value": "Sindh strike blocks critical transport corridors",
+            "source_ids": [
+              "src_news_01"
+            ],
+            "confidence": 0.85,
+            "trend": "volatile",
+            "rate_of_change": 0.0,
+            "risk_severity": "high"
+          }
+        ]
+      },
+      "outputs": {
+        "resolution": {
+          "contradictions": [
+            {
+              "metric": "stock_depletion_time",
+              "conflicting_values": [
+                {
+                  "source_id": "src_warehouse_01",
+                  "value": "stale 3-day old data",
+                  "credibility": 4
+                },
+                {
+                  "source_id": "src_supplier_01",
+                  "value": "depletion in 48 hours",
+                  "credibility": 9
+                }
+              ],
+              "winner_source_id": "src_supplier_01",
+              "reasoning": "The supplier warning is direct, strikes-aware, and dated today, whereas the warehouse CSV contains static readings that are 3 days stale."
+            }
+          ],
+          "resolution_type": "resolved",
+          "investigation_actions": [],
+          "confidence": 0.95
+        }
+      },
+      "thoughts": "Detected stock forecast contradiction between warehouse logs and supplier alerts. Resolved in favor of supplier based on strike recency weighting."
+    },
+    {
+      "timestamp": "2026-05-18T15:48:18.780825+00:00",
+      "agent": "ActionPlannerAgent",
+      "action": "plan_actions",
+      "inputs": {
+        "constraints": {
+          "budget_pkr_max": 500000,
+          "time_to_resolution_hours_max": 48,
+          "notification_deadline_hours_max": 2,
+          "api_rate_limit_per_minute": 10,
+          "resource_constraints": {
+            "warehouse_staff": 3,
+            "delivery_trucks": 5
+          }
+        }
+      },
+      "outputs": {
+        "actions": [
+          {
+            "action_id": "act_001",
+            "name": "validate_stock",
+            "description": "Trigger real-time RFID/physical stock validation in the central warehouse to verify if the 3,200 quantity is correct.",
+            "depends_on": [],
+            "estimated_cost_pkr": 0,
+            "estimated_duration_minutes": 5,
+            "affected_resources": [
+              "warehouse_staff"
+            ],
+            "urgency_tier": "critical",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_002",
+            "name": "notify_procurement",
+            "description": "Email the procurement board and draft the supply replenishment request.",
+            "depends_on": [
+              "act_001"
+            ],
+            "estimated_cost_pkr": 0,
+            "estimated_duration_minutes": 10,
+            "affected_resources": [
+              "procurement_team"
+            ],
+            "urgency_tier": "high",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_003",
+            "name": "emergency_order",
+            "description": "Place a high-priority emergency order of 8,000 units with Karachi Supplies (requires human-in-the-loop approval due to cashflow impact).",
+            "depends_on": [
+              "act_002"
+            ],
+            "estimated_cost_pkr": 450000,
+            "estimated_duration_minutes": 1440,
+            "affected_resources": [
+              "budget",
+              "supplier"
+            ],
+            "urgency_tier": "critical",
+            "is_destructive": true,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_004",
+            "name": "update_delivery",
+            "description": "Stagger outbound deliveries to key retailers and update delivery ETA logs in the company CRM.",
+            "depends_on": [
+              "act_003"
+            ],
+            "estimated_cost_pkr": 15000,
+            "estimated_duration_minutes": 60,
+            "affected_resources": [
+              "delivery_trucks"
+            ],
+            "urgency_tier": "medium",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_005",
+            "name": "schedule_monitoring",
+            "description": "Schedule a cron monitoring agent to track cooking oil stock levels every 3 hours.",
+            "depends_on": [
+              "act_004"
+            ],
+            "estimated_cost_pkr": 0,
+            "estimated_duration_minutes": 10,
+            "affected_resources": [
+              "monitoring_system"
+            ],
+            "urgency_tier": "low",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          }
+        ]
+      },
+      "thoughts": "Formulated a budget-compliant replenishment plan with throttle rates to bypass API limits."
+    },
+    {
+      "timestamp": "2026-05-18T15:48:26.200425+00:00",
+      "agent": "SideEffectAnalyzerAgent",
+      "action": "analyze_impacts",
+      "inputs": {
+        "actions": [
+          "act_001",
+          "act_002",
+          "act_003",
+          "act_004",
+          "act_005"
+        ]
+      },
+      "outputs": {
+        "requires_approval": true,
+        "analyses": [
+          {
+            "action_id": "act_003",
+            "impacts": [
+              {
+                "area": "cashflow",
+                "direction": "negative",
+                "magnitude": "high",
+                "explanation": "Emergency order of PKR 450,000 reduces available cash reserves by ~18% instantly.",
+                "mitigation": "Utilize the Karachi Bypass: split order into 2 staggered deliveries spaced 3 days apart."
+              },
+              {
+                "area": "warehouse_capacity",
+                "direction": "positive",
+                "magnitude": "medium",
+                "explanation": "Replenishing stock restores warehouse stock levels and avoids dry shelf penalty charges.",
+                "mitigation": "Clear temporary loading bays to prepare for sudden stock arrivals."
+              },
+              {
+                "area": "customer_satisfaction",
+                "direction": "positive",
+                "magnitude": "high",
+                "explanation": "Preventing SKU001 stockouts avoids stockout complaints and secures standard weekly sales revenue.",
+                "mitigation": "None needed - massive positive outcome."
+              },
+              {
+                "area": "supplier_relationships",
+                "direction": "negative",
+                "magnitude": "low",
+                "explanation": "Short lead time emergency request places additional strain on supplier's logistics.",
+                "mitigation": "Offer a 5% premium bonus on future non-emergency replenishment schedules."
+              }
+            ],
+            "requires_approval": true,
+            "alternative_path": [
+              {
+                "name": "staggered_order",
+                "description": "Split emergency order into 3 smaller batches over 3 days (avoids cashflow spikes)",
+                "estimated_cost_pkr": 450000,
+                "estimated_duration_minutes": 4320,
+                "simulated_after_state": {
+                  "Stock Level": "Optimal (Reached Day 3)",
+                  "Supplier Lead Time": "8 Days (Split)",
+                  "Delivery Frequency": "Tri-Weekly",
+                  "Cashflow Impact": "-PKR 150,000 / day",
+                  "Customer Complaints": "Low (2 active)",
+                  "Stockout Probability": "4%"
+                }
+              },
+              {
+                "name": "regional_supplier_shift",
+                "description": "Karachi Bypass: Order 40% stock from local Karachi supplier (evades transport strike routes)",
+                "estimated_cost_pkr": 405000,
+                "estimated_duration_minutes": 1440,
+                "simulated_after_state": {
+                  "Stock Level": "Optimal (Reached Day 1)",
+                  "Supplier Lead Time": "3 Days (Local)",
+                  "Delivery Frequency": "Daily",
+                  "Cashflow Impact": "-PKR 400,000 (Premium)",
+                  "Customer Complaints": "Low (0 active)",
+                  "Stockout Probability": "0%"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "thoughts": "Predicted high-magnitude cashflow drawdown for emergency order, triggering human approval modal request."
+    },
+    {
+      "timestamp": "2026-05-18T15:48:36.385762+00:00",
+      "agent": "ADK_Root",
+      "action": "gather_human_approval",
+      "inputs": {
+        "approval_id": "appr_66409f"
+      },
+      "outputs": {
+        "approval_id": "appr_66409f",
+        "decision": "modify",
+        "modification": "staggered_order"
+      },
+      "thoughts": "Human-in-the-loop decision collected: modify"
+    },
+    {
+      "timestamp": "2026-05-18T15:48:40.332650+00:00",
+      "agent": "ExecutionAgent",
+      "action": "execute_stateful_graph",
+      "inputs": {
+        "actions_chain": [
+          "validate_stock",
+          "notify_procurement",
+          "staggered_order",
+          "update_delivery",
+          "schedule_monitoring"
+        ]
+      },
+      "outputs": {
+        "execution_log": [
+          {
+            "step_number": 1,
+            "action_id": "act_001",
+            "action_name": "validate_stock",
+            "status": "success",
+            "started_at": "2026-05-18T15:48:36.412794+00:00",
+            "completed_at": "2026-05-18T15:48:36.862324+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "validate_stock": "completed"
+            }
+          },
+          {
+            "step_number": 2,
+            "action_id": "act_002",
+            "action_name": "notify_procurement",
+            "status": "success",
+            "started_at": "2026-05-18T15:48:36.870082+00:00",
+            "completed_at": "2026-05-18T15:48:37.153554+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "notify_procurement": "completed"
+            }
+          },
+          {
+            "step_number": 3,
+            "action_id": "act_003",
+            "action_name": "emergency_order",
+            "status": "failed",
+            "started_at": "2026-05-18T15:48:37.158428+00:00",
+            "completed_at": "2026-05-18T15:48:37.889906+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": "Supplier API temporarily unavailable \u2014 service overloaded",
+            "state_diff": {}
+          },
+          {
+            "step_number": 3,
+            "action_id": "act_003",
+            "action_name": "emergency_order",
+            "status": "success",
+            "started_at": "2026-05-18T15:48:38.902970+00:00",
+            "completed_at": "2026-05-18T15:48:39.492199+00:00",
+            "retried": 1,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "emergency_order": "completed"
+            }
+          },
+          {
+            "step_number": 4,
+            "action_id": "act_004",
+            "action_name": "update_delivery",
+            "status": "success",
+            "started_at": "2026-05-18T15:48:39.498098+00:00",
+            "completed_at": "2026-05-18T15:48:39.962479+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "update_delivery": "completed"
+            }
+          },
+          {
+            "step_number": 5,
+            "action_id": "act_005",
+            "action_name": "schedule_monitoring",
+            "status": "success",
+            "started_at": "2026-05-18T15:48:39.967680+00:00",
+            "completed_at": "2026-05-18T15:48:40.300944+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "schedule_monitoring": "completed"
+            }
+          }
+        ]
+      },
+      "thoughts": "Orchestrated stateful action node transitions. Successfully completed all recovery tasks."
+    },
+    {
+      "timestamp": "2026-05-18T15:48:48.166508+00:00",
+      "agent": "ADK_Root",
+      "action": "finalize_run",
+      "inputs": {
+        "status": "completed"
+      },
+      "outputs": {
+        "duration_seconds": 64.517595
+      },
+      "thoughts": "ADK Pipeline finished executing all agent stages. Finalizing trace exporter."
+    }
+  ]
+}

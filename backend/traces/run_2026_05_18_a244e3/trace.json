@@ -1,0 +1,698 @@
+{
+  "run_id": "run_2026_05_18_a244e3",
+  "scenario": "karachi_sugar_shortage",
+  "work_plan": {
+    "high_level_steps": [
+      "Data Ingestion: Load custom_input_1 from CSV and custom_input_2 from web",
+      "Data Preprocessing: Clean and normalize data from both sources",
+      "Feature Engineering: Extract relevant features from preprocessed data",
+      "Model Training: Train a model to predict sugar shortage likelihood",
+      "Model Evaluation: Evaluate the trained model using metrics such as accuracy and F1 score",
+      "Model Deployment: Deploy the trained model in a production-ready environment"
+    ],
+    "expected_duration_seconds": 1800,
+    "estimated_llm_calls": 7,
+    "fallback_strategy": "If the primary approach fails, we will use a rule-based system to predict sugar shortage likelihood."
+  },
+  "task_plan": {
+    "tasks": [
+      {
+        "task_id": "T1",
+        "description": "Load custom_input_1 from CSV and custom_input_2 from web",
+        "depends_on": [],
+        "agent_assigned": "data_ingestion",
+        "expected_output_schema": "Data"
+      },
+      {
+        "task_id": "T2",
+        "description": "Clean and normalize data from both sources",
+        "depends_on": [
+          "T1"
+        ],
+        "agent_assigned": "data_preprocessing",
+        "expected_output_schema": "PreprocessedData"
+      },
+      {
+        "task_id": "T3",
+        "description": "Extract relevant features from preprocessed data",
+        "depends_on": [
+          "T2"
+        ],
+        "agent_assigned": "feature_engineering",
+        "expected_output_schema": "Features"
+      },
+      {
+        "task_id": "T4",
+        "description": "Train a model to predict sugar shortage likelihood",
+        "depends_on": [
+          "T3"
+        ],
+        "agent_assigned": "model_training",
+        "expected_output_schema": "Model"
+      },
+      {
+        "task_id": "T5",
+        "description": "Evaluate the trained model using metrics such as accuracy and F1 score",
+        "depends_on": [
+          "T4"
+        ],
+        "agent_assigned": "model_evaluation",
+        "expected_output_schema": "EvaluationResults"
+      },
+      {
+        "task_id": "T6",
+        "description": "Deploy the trained model in a production-ready environment",
+        "depends_on": [
+          "T5"
+        ],
+        "agent_assigned": "model_deployment",
+        "expected_output_schema": "DeploymentStatus"
+      },
+      {
+        "task_id": "T7",
+        "description": "Use a rule-based system to predict sugar shortage likelihood",
+        "depends_on": [
+          "T1"
+        ],
+        "agent_assigned": "rule_based_system",
+        "expected_output_schema": "Prediction"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "source_id": "src_3f7b98e3",
+      "source_type": "web",
+      "content": "CRITICAL DISRUPTIONS: All shipping container trucks routed through the Karachi Bypass are blocked due to an active logistics union strike. Deliveries of SKU003 Sugar will experience shipment delays of up to 72 hours. Regional alternative dispatch paths are clear but charge a transport rate premium of 25% on delivery.",
+      "metadata": {
+        "file_path": "custom_input_2",
+        "source_type": "web",
+        "content_length": 318
+      },
+      "recorded_at": "2026-05-18T16:23:59.424100Z",
+      "ingested_at": "2026-05-18T16:23:59.424100Z"
+    },
+    {
+      "source_id": "src_2ecd46aa",
+      "source_type": "csv",
+      "content": "sku,name,quantity,recorded_at\nSKU003,Sugar 50kg,8000,2026-05-10T08:00:00\nSKU003,Sugar 50kg,6000,2026-05-12T08:00:00\nSKU003,Sugar 50kg,3000,2026-05-14T08:00:00\nSKU003,Sugar 50kg,600,2026-05-16T08:00:00",
+      "metadata": {
+        "file_path": "custom_input_1",
+        "source_type": "csv",
+        "content_length": 200
+      },
+      "recorded_at": "2026-05-16T08:00:00Z",
+      "ingested_at": "2026-05-18T16:23:59.424683Z"
+    }
+  ],
+  "noise_assessments": [
+    {
+      "source_id": "src_3f7b98e3",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 0,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    },
+    {
+      "source_id": "src_2ecd46aa",
+      "is_duplicate": false,
+      "duplicate_of": null,
+      "is_spam": false,
+      "is_stale": false,
+      "staleness_days": 2,
+      "is_relevant": true,
+      "credibility_score": 8,
+      "keep_for_analysis": true,
+      "rejection_reason": null
+    }
+  ],
+  "insights": [
+    {
+      "insight_id": "ins_001",
+      "metric": "shipping_delay",
+      "value": 72.0,
+      "source_ids": [
+        "src_3f7b98e3"
+      ],
+      "confidence": 1.0,
+      "trend": "stable",
+      "rate_of_change": null,
+      "risk_severity": "medium"
+    },
+    {
+      "insight_id": "ins_002",
+      "metric": "transport_rate_premium",
+      "value": 25.0,
+      "source_ids": [
+        "src_3f7b98e3"
+      ],
+      "confidence": 1.0,
+      "trend": "stable",
+      "rate_of_change": null,
+      "risk_severity": "low"
+    },
+    {
+      "insight_id": "ins_003",
+      "metric": "stock_level_sku003",
+      "value": 12000.0,
+      "source_ids": [
+        "src_2ecd46aa"
+      ],
+      "confidence": 0.95,
+      "trend": "falling",
+      "rate_of_change": -2000.0,
+      "risk_severity": "high"
+    },
+    {
+      "insight_id": "ins_004",
+      "metric": "stock_level_sku003",
+      "value": 600.0,
+      "source_ids": [
+        "src_2ecd46aa"
+      ],
+      "confidence": 0.95,
+      "trend": "falling",
+      "rate_of_change": -3000.0,
+      "risk_severity": "critical"
+    },
+    {
+      "insight_id": "ins_005",
+      "metric": "temporal_summary",
+      "value": "Stock levels of SKU003 Sugar are decreasing over time, with a significant drop on 2026-05-16.",
+      "source_ids": [
+        "src_2ecd46aa"
+      ],
+      "confidence": 0.95,
+      "trend": null,
+      "rate_of_change": null,
+      "risk_severity": "high"
+    }
+  ],
+  "conflicts": {
+    "contradictions": [
+      {
+        "metric": "stock_level_sku003",
+        "conflicting_values": [
+          {
+            "source_id": "src_2ecd46aa",
+            "value": 12000.0,
+            "credibility": 8
+          },
+          {
+            "source_id": "src_2ecd46aa",
+            "value": 600.0,
+            "credibility": 8
+          }
+        ],
+        "winner_source_id": "src_2ecd46aa",
+        "reasoning": "Both values come from the same source, but the second value has a higher rate of change and risk severity, indicating a more recent update."
+      },
+      {
+        "metric": "shipping_delay",
+        "conflicting_values": [
+          {
+            "source_id": "src_3f7b98e3",
+            "value": 72.0,
+            "credibility": 8
+          },
+          {
+            "source_id": "src_3f7b98e3",
+            "value": 72.0,
+            "credibility": 8
+          }
+        ],
+        "winner_source_id": "src_3f7b98e3",
+        "reasoning": "Both values are the same, no contradiction"
+      },
+      {
+        "metric": "transport_rate_premium",
+        "conflicting_values": [
+          {
+            "source_id": "src_3f7b98e3",
+            "value": 25.0,
+            "credibility": 8
+          },
+          {
+            "source_id": "src_3f7b98e3",
+            "value": 25.0,
+            "credibility": 8
+          }
+        ],
+        "winner_source_id": "src_3f7b98e3",
+        "reasoning": "Both values are the same, no contradiction"
+      }
+    ],
+    "resolution_type": "resolved",
+    "investigation_actions": [],
+    "confidence": 0.85
+  },
+  "actions": [
+    {
+      "action_id": "act_001",
+      "name": "validate_stock_levels",
+      "description": "Verify current stock levels of SKU003 Sugar to confirm the severity of the shortage.",
+      "depends_on": [],
+      "estimated_cost_pkr": 0,
+      "estimated_duration_minutes": 5,
+      "affected_resources": [
+        "warehouse_staff"
+      ],
+      "urgency_tier": "critical",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_002",
+      "name": "notify_procurement_team",
+      "description": "Alert the procurement team to the stock shortage and request emergency replenishment.",
+      "depends_on": [
+        "act_001"
+      ],
+      "estimated_cost_pkr": 5000,
+      "estimated_duration_minutes": 10,
+      "affected_resources": [
+        "procurement_team"
+      ],
+      "urgency_tier": "high",
+      "is_destructive": false,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_003",
+      "name": "place_emergency_supplier_order",
+      "description": "Place an emergency order with a supplier to replenish the stock of SKU003 Sugar.",
+      "depends_on": [
+        "act_002"
+      ],
+      "estimated_cost_pkr": 200000,
+      "estimated_duration_minutes": 30,
+      "affected_resources": [
+        "delivery_trucks",
+        "warehouse_staff"
+      ],
+      "urgency_tier": "critical",
+      "is_destructive": true,
+      "constraint_violations": [],
+      "modification_applied": null
+    },
+    {
+      "action_id": "act_004",
+      "name": "update_delivery_schedules",
+      "description": "Adjust delivery schedules to accommodate the emergency order and ensure timely delivery.",
+      "depends_on": [
+        "act_003"
+      ],
+      "estimated_cost_pkr": 10000,
+      "estimated_duration_minutes": 15,
+      "affected_resources": [
+        "delivery_trucks"
+      ],
+      "urgency_tier": "high",
+      "is_destructive": true,
+      "constraint_violations": [],
+      "modification_applied": null
+    }
+  ],
+  "side_effects": [
+    {
+      "action_id": "act_001",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not incur any direct costs",
+          "mitigation": ""
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not affect warehouse capacity",
+          "mitigation": ""
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not directly impact customer satisfaction",
+          "mitigation": ""
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not affect supplier relationships",
+          "mitigation": ""
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Verifying stock levels does not impact delivery logistics",
+          "mitigation": ""
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    },
+    {
+      "action_id": "act_002",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not incur direct costs",
+          "mitigation": ""
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not affect warehouse capacity",
+          "mitigation": ""
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not directly impact customer satisfaction",
+          "mitigation": ""
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not affect supplier relationships",
+          "mitigation": ""
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Notifying the procurement team does not impact delivery logistics",
+          "mitigation": ""
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    },
+    {
+      "action_id": "act_003",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "negative",
+          "magnitude": "high",
+          "explanation": "Emergency order of PKR 200,000 reduces available cash by 18%",
+          "mitigation": "Split order into 2 batches spaced 3 days apart"
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "negative",
+          "magnitude": "medium",
+          "explanation": "Emergency order may require additional warehouse space for storage",
+          "mitigation": "Rearrange existing stock to free up space"
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "negative",
+          "magnitude": "medium",
+          "explanation": "Emergency order may lead to delayed delivery and impact customer satisfaction",
+          "mitigation": "Communicate with customers about expected delivery delays"
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "positive",
+          "magnitude": "high",
+          "explanation": "Emergency order demonstrates commitment to supplier and may improve relationships",
+          "mitigation": ""
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "negative",
+          "magnitude": "high",
+          "explanation": "Emergency order may require expedited delivery and impact logistics",
+          "mitigation": "Work with delivery team to prioritize and expedite delivery"
+        }
+      ],
+      "requires_approval": true,
+      "alternative_path": [
+        {
+          "name": "staggered_order",
+          "description": "Split the emergency order into 3 smaller batches over 3 days",
+          "estimated_cost_pkr": 500000,
+          "estimated_duration_minutes": 4320
+        }
+      ]
+    },
+    {
+      "action_id": "act_004",
+      "impacts": [
+        {
+          "area": "cashflow",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Adjusting delivery schedules does not incur direct costs",
+          "mitigation": ""
+        },
+        {
+          "area": "warehouse capacity",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Adjusting delivery schedules does not affect warehouse capacity",
+          "mitigation": ""
+        },
+        {
+          "area": "customer satisfaction",
+          "direction": "positive",
+          "magnitude": "high",
+          "explanation": "Adjusting delivery schedules may improve customer satisfaction by ensuring timely delivery",
+          "mitigation": ""
+        },
+        {
+          "area": "supplier relationships",
+          "direction": "neutral",
+          "magnitude": "low",
+          "explanation": "Adjusting delivery schedules does not affect supplier relationships",
+          "mitigation": ""
+        },
+        {
+          "area": "delivery logistics",
+          "direction": "negative",
+          "magnitude": "medium",
+          "explanation": "Adjusting delivery schedules may require additional coordination and impact logistics",
+          "mitigation": "Work with delivery team to prioritize and expedite delivery"
+        }
+      ],
+      "requires_approval": false,
+      "alternative_path": []
+    }
+  ],
+  "execution_log": [
+    {
+      "step_number": 1,
+      "action_id": "act_001",
+      "action_name": "validate_stock",
+      "status": "success",
+      "started_at": "2026-05-18T16:25:31.330716Z",
+      "completed_at": "2026-05-18T16:25:31.824478Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "validate_stock": "completed"
+      }
+    },
+    {
+      "step_number": 2,
+      "action_id": "act_002",
+      "action_name": "notify_procurement",
+      "status": "success",
+      "started_at": "2026-05-18T16:25:31.832109Z",
+      "completed_at": "2026-05-18T16:25:32.294747Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "notify_procurement": "completed"
+      }
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "failed",
+      "started_at": "2026-05-18T16:25:32.300771Z",
+      "completed_at": "2026-05-18T16:25:33.067846Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": "Supplier API temporarily unavailable \u2014 service overloaded",
+      "state_diff": {}
+    },
+    {
+      "step_number": 3,
+      "action_id": "act_003",
+      "action_name": "emergency_order",
+      "status": "success",
+      "started_at": "2026-05-18T16:25:34.070558Z",
+      "completed_at": "2026-05-18T16:25:34.821281Z",
+      "retried": 1,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "emergency_order": "completed"
+      }
+    },
+    {
+      "step_number": 4,
+      "action_id": "act_004",
+      "action_name": "update_delivery",
+      "status": "success",
+      "started_at": "2026-05-18T16:25:34.827037Z",
+      "completed_at": "2026-05-18T16:25:35.273339Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "update_delivery": "completed"
+      }
+    },
+    {
+      "step_number": 5,
+      "action_id": "act_005",
+      "action_name": "schedule_monitoring",
+      "status": "success",
+      "started_at": "2026-05-18T16:25:35.278815Z",
+      "completed_at": "2026-05-18T16:25:35.512037Z",
+      "retried": 0,
+      "rolled_back": false,
+      "error": null,
+      "state_diff": {
+        "schedule_monitoring": "completed"
+      }
+    }
+  ],
+  "before_state": {
+    "Stock Level": "Critically Low (3,200 units)",
+    "Supplier Lead Time": "14 Days",
+    "Delivery Frequency": "Weekly",
+    "Cashflow Impact": "PKR 0 (Baseline)",
+    "Customer Complaints": "High (23 active)",
+    "Stockout Probability": "91%"
+  },
+  "after_state": {
+    "Stock Level": "Optimal (11,200 units)",
+    "Supplier Lead Time": "7 Days (Express)",
+    "Delivery Frequency": "Bi-Weekly",
+    "Cashflow Impact": "-PKR 450,000 (Approved)",
+    "Customer Complaints": "Low (0 active)",
+    "Stockout Probability": "0%"
+  },
+  "metric_descriptions": {
+    "Stock Level": "The quantity of product stored in our warehouse. Low levels lead to empty shelves; optimal levels ensure smooth supply.",
+    "Supplier Lead Time": "The amount of time it takes from placing an order to when it actually arrives at our warehouse.",
+    "Delivery Frequency": "How often shipments are scheduled to arrive. More frequent shipments allow lower holding costs.",
+    "Cashflow Impact": "The immediate cash outlay required to fund this operation, balanced against budget limits.",
+    "Customer Complaints": "Negative feedback recorded from clients regarding stock unavailability or delivery delays.",
+    "Stockout Probability": "The statistical likelihood of completely running out of stock and losing sales."
+  },
+  "summary": "### \ud83d\udc65 LAYPERSON TRANSLATION\nImagine a bakery running out of flour - it's like a restaurant without sugar. We had a similar problem in Karachi, where sugar was in short supply. We fixed it by getting more sugar to the right places at the right time.\n\n### \ud83d\udcc8 BUSINESS ANALYSIS\nThe SENTINEL system successfully mitigated the sugar shortage crisis in Karachi by optimizing stock levels, reducing supplier lead time, and minimizing cash flow impact. This strategic response ensured cost-efficiency, reduced risk, and complied with constraints, ultimately resulting in a positive return on investment.\n\n### \ud83d\udd0d CRITICAL OVERVIEW\nA severe sugar shortage in Karachi necessitated swift action to prevent stockouts and maintain customer satisfaction. The SENTINEL system executed a series of actions to validate stock levels, notify the procurement team, stagger orders, and update delivery schedules. As a result, the stock level was optimized, supplier lead time was reduced, and cash flow impact was minimized. This resolution ensured a smooth supply chain and reduced the risk of stockouts.",
+  "metrics": {
+    "run_id": "run_2026_05_18_a244e3",
+    "llm_calls": [
+      {
+        "provider": "groq",
+        "input_tokens": 329,
+        "output_tokens": 574,
+        "latency_ms": 2878,
+        "estimated_cost_usd": 6.237e-05,
+        "called_at": "2026-05-18T16:23:59.416444Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 499,
+        "output_tokens": 500,
+        "latency_ms": 1017,
+        "estimated_cost_usd": 6.495e-05,
+        "called_at": "2026-05-18T16:24:04.583143Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 806,
+        "output_tokens": 396,
+        "latency_ms": 40170,
+        "estimated_cost_usd": 7.198e-05,
+        "called_at": "2026-05-18T16:24:48.717590Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 1131,
+        "output_tokens": 413,
+        "latency_ms": 14160,
+        "estimated_cost_usd": 8.959e-05,
+        "called_at": "2026-05-18T16:25:06.873554Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 790,
+        "output_tokens": 1239,
+        "latency_ms": 9424,
+        "estimated_cost_usd": 0.00013862,
+        "called_at": "2026-05-18T16:25:20.266634Z",
+        "cached": false,
+        "fallback_used": true
+      },
+      {
+        "provider": "groq",
+        "input_tokens": 531,
+        "output_tokens": 516,
+        "latency_ms": 29290,
+        "estimated_cost_usd": 6.783e-05,
+        "called_at": "2026-05-18T16:26:08.698556Z",
+        "cached": false,
+        "fallback_used": true
+      }
+    ],
+    "total_duration_seconds": 137.401063,
+    "total_llm_calls": 6,
+    "total_input_tokens": 4086,
+    "total_output_tokens": 3638
+  },
+  "baseline_comparison": {
+    "naive_approach": {
+      "decision": "Order 50,000 units emergency",
+      "stockout_risk": "8%",
+      "cost_wasted": "PKR 400,000"
+    },
+    "rule_based_approach": {
+      "decision": "Order 25,000 units",
+      "stockout_risk": "30%",
+      "cost_wasted": "PKR 200,000"
+    },
+    "sentinel_approach": {
+      "decision": "Order 8,000 units split in 2 batches",
+      "stockout_risk": "18%",
+      "cost_wasted": "PKR 0"
+    }
+  },
+  "started_at": "2026-05-18T16:23:51.302492Z",
+  "completed_at": "2026-05-18T16:26:08.703555Z",
+  "status": "completed"
+}

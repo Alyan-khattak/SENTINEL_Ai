@@ -12,11 +12,25 @@ from utils.llm_client import LLMClient, extract_json
 from utils.logger import logger
 
 
-def _analyze_side_effects_deterministic(action: Action) -> SideEffectAnalysis:
+def _analyze_side_effects_deterministic(action: Action, scenario: str = "inventory_shortage") -> SideEffectAnalysis:
     """Deterministic side-effect prediction for known action types."""
     impacts = []
     requires_approval = False
     alternative_path = None
+
+    # Determine product custom terms dynamically based on the scenario or action
+    prod = "Cooking Oil"
+    cash_stagger = "-PKR 150,000 / day"
+    cash_shift = "-PKR 400,000 (Premium)"
+    
+    if "wheat" in scenario.lower() or "wheat" in action.name.lower() or "sku004" in action.name.lower():
+        prod = "Wheat Flour"
+        cash_stagger = "-PKR 120,000 / day"
+        cash_shift = "-PKR 350,000 (Premium)"
+    elif "sugar" in scenario.lower() or "sugar" in action.name.lower() or "sku003" in action.name.lower():
+        prod = "Sugar"
+        cash_stagger = "-PKR 90,000 / day"
+        cash_shift = "-PKR 280,000 (Premium)"
 
     # Robust approval check: trigger if it is an order/purchase, costly (>10k PKR), or pre-flagged as destructive
     is_procurement = any(kw in action.name.lower() for kw in ["order", "purchase", "buy", "procure", "replenish", "shift", "change"])
@@ -47,15 +61,31 @@ def _analyze_side_effects_deterministic(action: Action) -> SideEffectAnalysis:
         alternative_path = [
             {
                 "name": "staggered_order",
-                "description": "Split emergency order into 3 smaller batches over 3 days (avoids cashflow spikes)",
+                "description": f"Split emergency {prod.lower()} procurement into 3 smaller batches over 3 days (avoids cashflow spikes)",
                 "estimated_cost_pkr": action.estimated_cost_pkr,
                 "estimated_duration_minutes": 4320,
+                "simulated_after_state": {
+                    "Stock Level": f"Optimal {prod} (Day 3)",
+                    "Supplier Lead Time": "8 Days (Split)",
+                    "Delivery Frequency": "Tri-Weekly",
+                    "Cashflow Impact": cash_stagger,
+                    "Customer Complaints": "Low (1 active)" if prod != "Cooking Oil" else "Low (2 active)",
+                    "Stockout Probability": "2%" if prod == "Wheat Flour" else ("5%" if prod == "Sugar" else "4%")
+                }
             },
             {
                 "name": "regional_supplier_shift",
-                "description": "Karachi Bypass: Order 40% stock from local Karachi supplier (evades transport strikes)",
+                "description": f"Karachi Bypass: Order 40% {prod.lower()} stock from regional Karachi supplier (evades transport strikes)",
                 "estimated_cost_pkr": int(action.estimated_cost_pkr * 0.9),
                 "estimated_duration_minutes": 1440,
+                "simulated_after_state": {
+                    "Stock Level": f"Optimal {prod} (Day 1)",
+                    "Supplier Lead Time": "3 Days (Local)",
+                    "Delivery Frequency": "Daily",
+                    "Cashflow Impact": cash_shift,
+                    "Customer Complaints": "Low (0 active)",
+                    "Stockout Probability": "0%"
+                }
             }
         ]
 
@@ -139,7 +169,7 @@ async def run_side_effect_analyzer(
             analyses = []
 
     if not analyses:
-        analyses = [_analyze_side_effects_deterministic(action) for action in actions]
+        analyses = [_analyze_side_effects_deterministic(action, scenario) for action in actions]
 
     approval_needed = sum(1 for a in analyses if a.requires_approval)
     logger.info(f"[{run_id}] Side-Effect analysis complete: {approval_needed} actions need approval")
