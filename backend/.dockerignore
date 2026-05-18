@@ -1,0 +1,30 @@
+# Ignore local virtual environments
+venv/
+.venv/
+env/
+.env
+
+# Ignore python caches
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Ignore local trace files and databases
+db/app.db
+db/app.db-journal
+db/app.db-wal
+traces/run_*
+*.log
+
+# Ignore VSCode and IDE settings
+.vscode/
+.idea/
+.git/
+.gitignore
+
+# Ignore build outputs
+build/
+dist/
