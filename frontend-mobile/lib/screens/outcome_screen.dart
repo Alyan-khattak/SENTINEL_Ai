@@ -141,6 +141,15 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           'estimated_duration_minutes': 4320,
           'pros': 'Extremely stable daily bank balance; avoids immediate liquidity freeze.',
           'cons': 'Warehouse reaches safety target 48 hours later than direct path.',
+          'steps': [
+            'Validate current stock in warehouse',
+            'Notify procurement department of impending stockout',
+            'Place emergency order 1/3 (35% volume)',
+            'Place emergency order 2/3 (35% volume)',
+            'Place emergency order 3/3 (30% volume)',
+            'Update CRM with staggered delivery schedules',
+            'Schedule logistics monitoring and tracking'
+          ]
         },
         {
           'name': 'regional_supplier_shift',
@@ -149,6 +158,14 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           'estimated_duration_minutes': 1440,
           'pros': 'Bypasses country-wide transportation strikes; achieves 24-hour dispatch.',
           'cons': 'Requires higher freight premium per unit.',
+          'steps': [
+            'Validate current stock in warehouse',
+            'Notify procurement department of impending stockout',
+            'Place regional emergency order (40% volume from Local supplier)',
+            'Place standard emergency order (60% volume from Primary supplier)',
+            'Update CRM with regional/primary delivery schedule',
+            'Schedule logistics monitoring and tracking'
+          ]
         },
         {
           'name': 'express_shipping',
@@ -157,6 +174,13 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
           'estimated_duration_minutes': 2160,
           'pros': 'Fastest shipping lead-time of 5 days from international hub.',
           'cons': 'Highest budget utilization rate.',
+          'steps': [
+            'Validate current stock in warehouse',
+            'Notify procurement department of impending stockout',
+            'Place Priority Express order (including air-freight premium slot)',
+            'Update CRM with express shipping delivery schedule',
+            'Schedule logistics monitoring and tracking'
+          ]
         }
       ]);
     }
@@ -343,6 +367,67 @@ class _OutcomeScreenState extends State<OutcomeScreen> {
                       _altStats('Est. Delay/Duration', '${((alt['estimated_duration_minutes'] ?? 0) / 60).toStringAsFixed(1)} hrs', SentinelTheme.blue),
                     ],
                   ),
+                  if (alt['steps'] != null && (alt['steps'] as List).isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    const Text('SUGGESTED PATH STEPS', style: TextStyle(color: SentinelTheme.cyan, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                    const SizedBox(height: 10),
+                    ...(alt['steps'] as List).asMap().entries.map((entry) {
+                      final idx = entry.key;
+                      final stepText = entry.value.toString();
+                      final isLastStep = idx == (alt['steps'] as List).length - 1;
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              children: [
+                                Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                    color: SentinelTheme.cyan.withOpacity(0.15),
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: SentinelTheme.cyan.withOpacity(0.7), width: 1.5),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      '${idx + 1}',
+                                      style: const TextStyle(
+                                        color: SentinelTheme.cyan,
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                if (!isLastStep)
+                                  Container(
+                                    width: 1.5,
+                                    height: 18,
+                                    color: SentinelTheme.cyan.withOpacity(0.25),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 1),
+                                child: Text(
+                                  stepText,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  ],
                   if (alt['pros'] != null) ...[
                     const SizedBox(height: 12),
                     const Text('👍 KEY ADVANTAGE', style: TextStyle(color: SentinelTheme.emerald, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.1)),

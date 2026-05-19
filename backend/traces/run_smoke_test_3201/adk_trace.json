@@ -1,0 +1,886 @@
+{
+  "run_id": "run_smoke_test_3201",
+  "scenario": "inventory_shortage",
+  "started_at": "2026-05-19T01:19:49.691987+00:00",
+  "completed_at": "2026-05-19T01:22:59.301923+00:00",
+  "status": "completed",
+  "trace_events": [
+    {
+      "timestamp": "2026-05-19T01:19:49.691987+00:00",
+      "agent": "ADK_Root",
+      "action": "initialize_run",
+      "inputs": {
+        "scenario": "inventory_shortage",
+        "constraints": {
+          "budget_pkr_max": 500000,
+          "time_to_resolution_hours_max": 48,
+          "notification_deadline_hours_max": 2,
+          "api_rate_limit_per_minute": 10,
+          "resource_constraints": {}
+        }
+      },
+      "outputs": {
+        "status": "running"
+      },
+      "thoughts": "Initialized RunContext. Setting up agent pipeline sequentially."
+    },
+    {
+      "timestamp": "2026-05-19T01:19:50.359834+00:00",
+      "agent": "PlannerAgent",
+      "action": "plan_pipeline",
+      "inputs": {
+        "scenario": "inventory_shortage",
+        "sources": 1
+      },
+      "outputs": {
+        "work_plan": {
+          "high_level_steps": [
+            "Read inventory data from CSV file",
+            "Identify products with low stock levels",
+            "Analyze stock trends over the past 7 days",
+            "Predict future stock levels using LLM",
+            "Generate recommendations for restocking"
+          ],
+          "expected_duration_seconds": 300,
+          "estimated_llm_calls": 7,
+          "fallback_strategy": "If primary approach fails, use historical data to generate recommendations"
+        },
+        "task_plan": {
+          "tasks": [
+            {
+              "task_id": "T1",
+              "description": "Read inventory data from CSV file",
+              "depends_on": [],
+              "agent_assigned": "data_reader",
+              "expected_output_schema": "InventoryData"
+            },
+            {
+              "task_id": "T2",
+              "description": "Identify products with low stock levels",
+              "depends_on": [
+                "T1"
+              ],
+              "agent_assigned": "data_analyzer",
+              "expected_output_schema": "LowStockProducts"
+            },
+            {
+              "task_id": "T3",
+              "description": "Analyze stock trends over the past 7 days",
+              "depends_on": [
+                "T2"
+              ],
+              "agent_assigned": "data_analyzer",
+              "expected_output_schema": "StockTrends"
+            },
+            {
+              "task_id": "T4",
+              "description": "Predict future stock levels using LLM",
+              "depends_on": [
+                "T3"
+              ],
+              "agent_assigned": "planner",
+              "expected_output_schema": "FutureStockLevels"
+            },
+            {
+              "task_id": "T5",
+              "description": "Generate recommendations for restocking",
+              "depends_on": [
+                "T4"
+              ],
+              "agent_assigned": "planner",
+              "expected_output_schema": "RestockingRecommendations"
+            }
+          ]
+        }
+      },
+      "thoughts": "Parsed run scenario and formulated chronological pipeline execution task tree."
+    },
+    {
+      "timestamp": "2026-05-19T01:19:50.402085+00:00",
+      "agent": "IngestionAgent",
+      "action": "ingest_multi_format",
+      "inputs": {
+        "source_paths": [
+          {
+            "type": "csv",
+            "path": "mock-data/warehouse_stock_7days.csv",
+            "raw_content": null
+          }
+        ]
+      },
+      "outputs": {
+        "sources_count": 1
+      },
+      "thoughts": "Normalized multi-format stock CSVs, warnings, complaints, and strike logistics."
+    },
+    {
+      "timestamp": "2026-05-19T01:19:50.412920+00:00",
+      "agent": "NoiseFilterAgent",
+      "action": "filter_noise",
+      "inputs": {
+        "sources": [
+          "src_8c2eb7a3"
+        ]
+      },
+      "outputs": {
+        "kept": [
+          "src_8c2eb7a3"
+        ],
+        "rejected": []
+      },
+      "thoughts": "Successfully identified duplicate promotional sales listings and stale office logs, protecting downstream reasoning."
+    },
+    {
+      "timestamp": "2026-05-19T01:20:02.542941+00:00",
+      "agent": "InsightAgent",
+      "action": "extract_insights",
+      "inputs": {
+        "sources": [
+          "src_8c2eb7a3"
+        ]
+      },
+      "outputs": {
+        "insights": [
+          {
+            "insight_id": "ins_001",
+            "metric": "stock_level_sku001",
+            "value": 3200.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_002",
+            "metric": "stock_level_sku002",
+            "value": 4100.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "stable",
+            "rate_of_change": 0.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_003",
+            "metric": "stock_level_sku001_change",
+            "value": -1300.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -1300.0,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_004",
+            "metric": "stock_level_sku002_change",
+            "value": -100.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -100.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_005",
+            "metric": "stock_level_sku001_rate_of_change",
+            "value": -757.14,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_006",
+            "metric": "stock_level_sku002_rate_of_change",
+            "value": 0.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "stable",
+            "rate_of_change": 0.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_007",
+            "metric": "stock_level_sku001_trend",
+            "value": "falling",
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_008",
+            "metric": "stock_level_sku002_trend",
+            "value": "stable",
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "stable",
+            "rate_of_change": 0.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_009",
+            "metric": "temporal_summary",
+            "value": "Stock levels for SKU001 are falling rapidly, while SKU002 remains stable.",
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": null,
+            "rate_of_change": null,
+            "risk_severity": null
+          }
+        ]
+      },
+      "thoughts": "Extracted temporal decline trends and critical risk signals from verified sources."
+    },
+    {
+      "timestamp": "2026-05-19T01:21:22.319730+00:00",
+      "agent": "ConflictResolverAgent",
+      "action": "resolve_contradictions",
+      "inputs": {
+        "insights": [
+          {
+            "insight_id": "ins_001",
+            "metric": "stock_level_sku001",
+            "value": 3200.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_002",
+            "metric": "stock_level_sku002",
+            "value": 4100.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "stable",
+            "rate_of_change": 0.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_003",
+            "metric": "stock_level_sku001_change",
+            "value": -1300.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -1300.0,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_004",
+            "metric": "stock_level_sku002_change",
+            "value": -100.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -100.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_005",
+            "metric": "stock_level_sku001_rate_of_change",
+            "value": -757.14,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_006",
+            "metric": "stock_level_sku002_rate_of_change",
+            "value": 0.0,
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "stable",
+            "rate_of_change": 0.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_007",
+            "metric": "stock_level_sku001_trend",
+            "value": "falling",
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "falling",
+            "rate_of_change": -757.14,
+            "risk_severity": "critical"
+          },
+          {
+            "insight_id": "ins_008",
+            "metric": "stock_level_sku002_trend",
+            "value": "stable",
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": "stable",
+            "rate_of_change": 0.0,
+            "risk_severity": "low"
+          },
+          {
+            "insight_id": "ins_009",
+            "metric": "temporal_summary",
+            "value": "Stock levels for SKU001 are falling rapidly, while SKU002 remains stable.",
+            "source_ids": [
+              "src_8c2eb7a3"
+            ],
+            "confidence": 0.92,
+            "trend": null,
+            "rate_of_change": null,
+            "risk_severity": null
+          }
+        ]
+      },
+      "outputs": {
+        "resolution": {
+          "contradictions": [
+            {
+              "metric": "stock_level_sku001",
+              "conflicting_values": [
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": 3200.0,
+                  "credibility": 8
+                },
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": -1300.0,
+                  "credibility": 8
+                }
+              ],
+              "winner_source_id": "src_8c2eb7a3",
+              "reasoning": "Both values are from the same source, but the change in stock level is more informative. The source's credibility score is high, so we trust the change value."
+            },
+            {
+              "metric": "stock_level_sku002",
+              "conflicting_values": [
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": 4100.0,
+                  "credibility": 8
+                },
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": -100.0,
+                  "credibility": 8
+                }
+              ],
+              "winner_source_id": "src_8c2eb7a3",
+              "reasoning": "Similar to SKU001, the change in stock level is more informative. The source's credibility score is high, so we trust the change value."
+            },
+            {
+              "metric": "stock_level_sku001_rate_of_change",
+              "conflicting_values": [
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": -757.14,
+                  "credibility": 8
+                },
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": -1300.0,
+                  "credibility": 8
+                }
+              ],
+              "winner_source_id": "src_8c2eb7a3",
+              "reasoning": "The rate of change is the same as the change in stock level. We trust the change value."
+            },
+            {
+              "metric": "stock_level_sku002_rate_of_change",
+              "conflicting_values": [
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": 0.0,
+                  "credibility": 8
+                },
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": -100.0,
+                  "credibility": 8
+                }
+              ],
+              "winner_source_id": "src_8c2eb7a3",
+              "reasoning": "The rate of change is the same as the change in stock level. We trust the change value."
+            },
+            {
+              "metric": "stock_level_sku001_trend",
+              "conflicting_values": [
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": "falling",
+                  "credibility": 8
+                },
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": "falling",
+                  "credibility": 8
+                }
+              ],
+              "winner_source_id": "src_8c2eb7a3",
+              "reasoning": "Both values are the same, so there is no contradiction."
+            },
+            {
+              "metric": "stock_level_sku002_trend",
+              "conflicting_values": [
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": "stable",
+                  "credibility": 8
+                },
+                {
+                  "source_id": "src_8c2eb7a3",
+                  "value": "stable",
+                  "credibility": 8
+                }
+              ],
+              "winner_source_id": "src_8c2eb7a3",
+              "reasoning": "Both values are the same, so there is no contradiction."
+            }
+          ],
+          "resolution_type": "resolved",
+          "investigation_actions": [],
+          "confidence": 0.85
+        }
+      },
+      "thoughts": "Detected stock forecast contradiction between warehouse logs and supplier alerts. Resolved in favor of supplier based on strike recency weighting."
+    },
+    {
+      "timestamp": "2026-05-19T01:22:12.175382+00:00",
+      "agent": "ActionPlannerAgent",
+      "action": "plan_actions",
+      "inputs": {
+        "constraints": {
+          "budget_pkr_max": 500000,
+          "time_to_resolution_hours_max": 48,
+          "notification_deadline_hours_max": 2,
+          "api_rate_limit_per_minute": 10,
+          "resource_constraints": {}
+        }
+      },
+      "outputs": {
+        "actions": [
+          {
+            "action_id": "act_001",
+            "name": "validate_stock_levels",
+            "description": "Verify current stock levels for SKU001 and SKU002 to confirm the inventory shortage.",
+            "depends_on": [],
+            "estimated_cost_pkr": 0,
+            "estimated_duration_minutes": 5,
+            "affected_resources": [
+              "warehouse_staff"
+            ],
+            "urgency_tier": "critical",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_002",
+            "name": "notify_procurement_team",
+            "description": "Inform the procurement team about the inventory shortage and request urgent replenishment.",
+            "depends_on": [
+              "act_001"
+            ],
+            "estimated_cost_pkr": 50000,
+            "estimated_duration_minutes": 10,
+            "affected_resources": [
+              "procurement_team"
+            ],
+            "urgency_tier": "high",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_003",
+            "name": "place_emergency_supplier_order",
+            "description": "Place an emergency order with the supplier to replenish the stock of SKU001.",
+            "depends_on": [
+              "act_002"
+            ],
+            "estimated_cost_pkr": 200000,
+            "estimated_duration_minutes": 30,
+            "affected_resources": [
+              "supplier_systems"
+            ],
+            "urgency_tier": "critical",
+            "is_destructive": true,
+            "constraint_violations": [],
+            "modification_applied": null
+          },
+          {
+            "action_id": "act_004",
+            "name": "update_delivery_schedules",
+            "description": "Update the delivery schedules to accommodate the emergency order and ensure timely delivery.",
+            "depends_on": [
+              "act_003"
+            ],
+            "estimated_cost_pkr": 100000,
+            "estimated_duration_minutes": 20,
+            "affected_resources": [
+              "delivery_team"
+            ],
+            "urgency_tier": "high",
+            "is_destructive": false,
+            "constraint_violations": [],
+            "modification_applied": null
+          }
+        ]
+      },
+      "thoughts": "Formulated a budget-compliant replenishment plan with throttle rates to bypass API limits."
+    },
+    {
+      "timestamp": "2026-05-19T01:22:37.373689+00:00",
+      "agent": "SideEffectAnalyzerAgent",
+      "action": "analyze_impacts",
+      "inputs": {
+        "actions": [
+          "act_001",
+          "act_002",
+          "act_003",
+          "act_004"
+        ]
+      },
+      "outputs": {
+        "requires_approval": true,
+        "analyses": [
+          {
+            "action_id": "act_001",
+            "impacts": [
+              {
+                "area": "cashflow",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Verifying stock levels does not incur any direct costs",
+                "mitigation": "None"
+              },
+              {
+                "area": "warehouse capacity",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Validating stock levels does not affect warehouse capacity",
+                "mitigation": "None"
+              },
+              {
+                "area": "customer satisfaction",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Verifying stock levels does not directly impact customer satisfaction",
+                "mitigation": "None"
+              },
+              {
+                "area": "supplier relationships",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Validating stock levels does not affect supplier relationships",
+                "mitigation": "None"
+              },
+              {
+                "area": "delivery logistics",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Verifying stock levels does not impact delivery logistics",
+                "mitigation": "None"
+              }
+            ],
+            "requires_approval": false,
+            "alternative_path": []
+          },
+          {
+            "action_id": "act_002",
+            "impacts": [
+              {
+                "area": "cashflow",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Notifying procurement team does not incur direct costs",
+                "mitigation": "None"
+              },
+              {
+                "area": "warehouse capacity",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Informing procurement team does not affect warehouse capacity",
+                "mitigation": "None"
+              },
+              {
+                "area": "customer satisfaction",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Notifying procurement team does not directly impact customer satisfaction",
+                "mitigation": "None"
+              },
+              {
+                "area": "supplier relationships",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Informing procurement team does not affect supplier relationships",
+                "mitigation": "None"
+              },
+              {
+                "area": "delivery logistics",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Notifying procurement team does not impact delivery logistics",
+                "mitigation": "None"
+              }
+            ],
+            "requires_approval": false,
+            "alternative_path": []
+          },
+          {
+            "action_id": "act_003",
+            "impacts": [
+              {
+                "area": "cashflow",
+                "direction": "negative",
+                "magnitude": "high",
+                "explanation": "Emergency order of PKR 500,000 reduces available cash by 18%",
+                "mitigation": "Split order into 2 batches spaced 3 days apart"
+              },
+              {
+                "area": "warehouse capacity",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Emergency order does not directly impact warehouse capacity",
+                "mitigation": "None"
+              },
+              {
+                "area": "customer satisfaction",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Emergency order does not directly impact customer satisfaction",
+                "mitigation": "None"
+              },
+              {
+                "area": "supplier relationships",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Emergency order does not affect supplier relationships",
+                "mitigation": "None"
+              },
+              {
+                "area": "delivery logistics",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Emergency order does not impact delivery logistics",
+                "mitigation": "None"
+              }
+            ],
+            "requires_approval": true,
+            "alternative_path": [
+              {
+                "name": "staggered_order",
+                "description": "Split the emergency order into 3 smaller batches over 3 days",
+                "estimated_cost_pkr": 500000,
+                "estimated_duration_minutes": 4320,
+                "steps": [
+                  "Validate current stock in warehouse",
+                  "Notify procurement department of impending stockout",
+                  "Place emergency order 1/3 for Cooking Oil (35% volume)",
+                  "Place emergency order 2/3 for Cooking Oil (35% volume)",
+                  "Place emergency order 3/3 for Cooking Oil (30% volume)",
+                  "Update CRM with staggered delivery schedules",
+                  "Schedule logistics monitoring and tracking"
+                ]
+              }
+            ]
+          },
+          {
+            "action_id": "act_004",
+            "impacts": [
+              {
+                "area": "cashflow",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Updating delivery schedules does not incur direct costs",
+                "mitigation": "None"
+              },
+              {
+                "area": "warehouse capacity",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Updating delivery schedules does not affect warehouse capacity",
+                "mitigation": "None"
+              },
+              {
+                "area": "customer satisfaction",
+                "direction": "positive",
+                "magnitude": "low",
+                "explanation": "Updating delivery schedules ensures timely delivery and improves customer satisfaction",
+                "mitigation": "None"
+              },
+              {
+                "area": "supplier relationships",
+                "direction": "neutral",
+                "magnitude": "low",
+                "explanation": "Updating delivery schedules does not affect supplier relationships",
+                "mitigation": "None"
+              },
+              {
+                "area": "delivery logistics",
+                "direction": "positive",
+                "magnitude": "low",
+                "explanation": "Updating delivery schedules improves delivery logistics and reduces delays",
+                "mitigation": "None"
+              }
+            ],
+            "requires_approval": false,
+            "alternative_path": []
+          }
+        ]
+      },
+      "thoughts": "Predicted high-magnitude cashflow drawdown for emergency order, triggering human approval modal request."
+    },
+    {
+      "timestamp": "2026-05-19T01:22:43.670201+00:00",
+      "agent": "ExecutionAgent",
+      "action": "execute_stateful_graph",
+      "inputs": {
+        "actions_chain": [
+          "validate_stock_levels",
+          "notify_procurement_team",
+          "place_emergency_supplier_order",
+          "update_delivery_schedules"
+        ]
+      },
+      "outputs": {
+        "execution_log": [
+          {
+            "step_number": 1,
+            "action_id": "act_001",
+            "action_name": "validate_stock",
+            "status": "success",
+            "started_at": "2026-05-19T01:22:39.422542+00:00",
+            "completed_at": "2026-05-19T01:22:39.893741+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "validate_stock": "completed"
+            }
+          },
+          {
+            "step_number": 2,
+            "action_id": "act_002",
+            "action_name": "notify_procurement",
+            "status": "success",
+            "started_at": "2026-05-19T01:22:39.900673+00:00",
+            "completed_at": "2026-05-19T01:22:40.372501+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "notify_procurement": "completed"
+            }
+          },
+          {
+            "step_number": 3,
+            "action_id": "act_003",
+            "action_name": "emergency_order",
+            "status": "failed",
+            "started_at": "2026-05-19T01:22:40.377524+00:00",
+            "completed_at": "2026-05-19T01:22:41.120475+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": "Supplier API temporarily unavailable \u2014 service overloaded",
+            "state_diff": {}
+          },
+          {
+            "step_number": 3,
+            "action_id": "act_003",
+            "action_name": "emergency_order",
+            "status": "success",
+            "started_at": "2026-05-19T01:22:42.128146+00:00",
+            "completed_at": "2026-05-19T01:22:42.839429+00:00",
+            "retried": 1,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "emergency_order": "completed"
+            }
+          },
+          {
+            "step_number": 4,
+            "action_id": "act_004",
+            "action_name": "update_delivery",
+            "status": "success",
+            "started_at": "2026-05-19T01:22:42.843896+00:00",
+            "completed_at": "2026-05-19T01:22:43.245373+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "update_delivery": "completed"
+            }
+          },
+          {
+            "step_number": 5,
+            "action_id": "act_005",
+            "action_name": "schedule_monitoring",
+            "status": "success",
+            "started_at": "2026-05-19T01:22:43.251710+00:00",
+            "completed_at": "2026-05-19T01:22:43.655133+00:00",
+            "retried": 0,
+            "rolled_back": false,
+            "error": null,
+            "state_diff": {
+              "schedule_monitoring": "completed"
+            }
+          }
+        ]
+      },
+      "thoughts": "Orchestrated stateful action node transitions. Successfully completed all recovery tasks."
+    },
+    {
+      "timestamp": "2026-05-19T01:22:59.301923+00:00",
+      "agent": "ADK_Root",
+      "action": "finalize_run",
+      "inputs": {
+        "status": "completed"
+      },
+      "outputs": {
+        "duration_seconds": 189.609936
+      },
+      "thoughts": "ADK Pipeline finished executing all agent stages. Finalizing trace exporter."
+    }
+  ]
+}

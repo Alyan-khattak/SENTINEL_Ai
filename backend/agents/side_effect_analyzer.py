@@ -64,6 +64,15 @@ def _analyze_side_effects_deterministic(action: Action, scenario: str = "invento
                 "description": f"Split emergency {prod.lower()} procurement into 3 smaller batches over 3 days (avoids cashflow spikes)",
                 "estimated_cost_pkr": action.estimated_cost_pkr,
                 "estimated_duration_minutes": 4320,
+                "steps": [
+                    "Validate current stock in warehouse",
+                    "Notify procurement department of impending stockout",
+                    f"Place emergency order 1/3 for {prod} (35% volume)",
+                    f"Place emergency order 2/3 for {prod} (35% volume)",
+                    f"Place emergency order 3/3 for {prod} (30% volume)",
+                    "Update CRM with staggered delivery schedules",
+                    "Schedule logistics monitoring and tracking"
+                ],
                 "simulated_after_state": {
                     "Stock Level": f"Optimal {prod} (Day 3)",
                     "Supplier Lead Time": "8 Days (Split)",
@@ -78,6 +87,14 @@ def _analyze_side_effects_deterministic(action: Action, scenario: str = "invento
                 "description": f"Karachi Bypass: Order 40% {prod.lower()} stock from regional Karachi supplier (evades transport strikes)",
                 "estimated_cost_pkr": int(action.estimated_cost_pkr * 0.9),
                 "estimated_duration_minutes": 1440,
+                "steps": [
+                    "Validate current stock in warehouse",
+                    "Notify procurement department of impending stockout",
+                    f"Place regional emergency order for {prod} (40% volume from Local supplier)",
+                    f"Place standard emergency order for {prod} (60% volume from Primary supplier)",
+                    "Update CRM with regional/primary delivery schedule",
+                    "Schedule logistics monitoring and tracking"
+                ],
                 "simulated_after_state": {
                     "Stock Level": f"Optimal {prod} (Day 1)",
                     "Supplier Lead Time": "3 Days (Local)",

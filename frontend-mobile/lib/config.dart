@@ -6,12 +6,12 @@ class AppConfig {
   static const String devBaseUrl = 'http://localhost:8001';
   static const String devWsUrl = 'ws://localhost:8001';
 
-  // Production URLs (Render deployment)
-  static const String prodBaseUrl = 'https://sentinel-api.onrender.com';
-  static const String prodWsUrl = 'wss://sentinel-api.onrender.com';
+  // Production URLs (Railway deployment)
+  static const String prodBaseUrl = 'https://sentinelai-production-e7d5.up.railway.app';
+  static const String prodWsUrl = 'wss://sentinelai-production-e7d5.up.railway.app';
 
   // Toggle for dev vs prod
-  static const bool isProduction = false;
+  static const bool isProduction = true;
 
   static String get baseUrl => isProduction ? prodBaseUrl : devBaseUrl;
   static String get wsUrl => isProduction ? prodWsUrl : devWsUrl;

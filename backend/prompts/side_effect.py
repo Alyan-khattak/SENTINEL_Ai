@@ -48,7 +48,16 @@ Output JSON only. No markdown fences. Return an array of per-action analyses:
         "name": "staggered_order",
         "description": "Split the emergency order into 3 smaller batches over 3 days",
         "estimated_cost_pkr": 500000,
-        "estimated_duration_minutes": 4320
+        "estimated_duration_minutes": 4320,
+        "steps": [
+          "Validate current stock in warehouse",
+          "Notify procurement department of impending stockout",
+          "Place emergency order 1/3 for Cooking Oil (35% volume)",
+          "Place emergency order 2/3 for Cooking Oil (35% volume)",
+          "Place emergency order 3/3 for Cooking Oil (30% volume)",
+          "Update CRM with staggered delivery schedules",
+          "Schedule logistics monitoring and tracking"
+        ]
       }}
     ]
   }}
