@@ -733,20 +733,36 @@ flowchart TD
 
 ---
 
-### 4.15 Demo Video Flow Map
-Shows the chronological timing layout for a 4-minute presentation video.
+### 4.15 API Gateway Overview
+All REST and WebSocket endpoints exposed by SENTINEL are versioned under `/api/v1/`. The interactive Swagger UI at `/docs` lets you execute any call directly from your browser.
 
 ```mermaid
 flowchart LR
-    M0[0:00-0:15<br/>Hook + 5 source files] --> M1
-    M1[0:15-0:35<br/>Plan Reveal] --> M2
-    M2[0:35-1:00<br/>Noise Rejection] --> M3
-    M3[1:00-1:35<br/>Contradiction Resolution] --> M4
-    M4[1:35-2:05<br/>Constraint Block] --> M5
-    M5[2:05-2:50<br/>Failure Recovery] --> M6
-    M6[2:50-3:15<br/>Side-Effect What-If] --> M7
-    M7[3:15-3:45<br/>Outcome + Metrics] --> M8
-    M8[3:45-4:00<br/>ADK Traces in Web Dashboard]
+    subgraph REST["REST Endpoints"]
+        R1["POST /api/v1/runs"]
+        R2["GET  /api/v1/runs"]
+        R3["GET  /api/v1/runs/{run_id}"]
+        R4["GET  /api/v1/runs/{run_id}/trace"]
+        R5["POST /api/v1/runs/{run_id}/approvals"]
+        R6["GET  /health"]
+    end
+    subgraph WS["WebSocket"]
+        W1["WS /ws/runs/{run_id}"]
+    end
+    subgraph EVENTS["Emitted WS Events"]
+        E1["run_started"]
+        E2["planner_done"]
+        E3["ingestion_done"]
+        E4["noise_filter_done"]
+        E5["insight_done"]
+        E6["conflict_done"]
+        E7["action_planner_done"]
+        E8["side_effect_done"]
+        E9["approval_required"]
+        E10["step_started / step_completed / step_failed / step_retrying / step_rolled_back"]
+        E11["run_completed / run_failed"]
+    end
+    W1 --> EVENTS
 ```
 
 ---
