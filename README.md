@@ -1293,7 +1293,7 @@ curl http://localhost:8001/api/v1/runs | python -m json.tool
 
 ## 6. Detailed Walkthrough of System Structure
 
-### 5.1 Project Folder Layout
+### 6.1 Project Folder Layout
 The codebase is organized into modules, isolating backend, mobile app, web dashboard, and test datasets:
 
 ```
@@ -1364,7 +1364,7 @@ sentinel-hackathon/
 
 ---
 
-### 5.2 How Features Work Under the Hood
+### 6.2 How Features Work Under the Hood
 
 #### 1. Ingestion & Rule-Based Filtering
 The **Ingestion Agent** receives files as byte paths, parsing them via native libraries (`pdfplumber` for PDF, `pandas` for CSV) to return a unified schema mapping. The **Noise Filter** inspects this stream: it computes similarity hashes (rejecting duplicate uploads), reads timestamps against a threshold (discarding stale logs), and checks keywords to flag spam. Clean signals are passed to the **Insight Agent**.
@@ -1393,9 +1393,9 @@ When the executor reaches a node marked `is_destructive=true` (such as completin
 
 ---
 
-## 6. Step-by-Step Local Setup & Running Guide
+## 7. Step-by-Step Local Setup & Running Guide
 
-### 6.1 Prerequisites
+### 7.1 Prerequisites
 Ensure the following packages are installed globally on your machine:
 *   Python 3.11+ (with `pip`)
 *   Node.js v18+ (with `npm`)
@@ -1404,7 +1404,7 @@ Ensure the following packages are installed globally on your machine:
 
 ---
 
-### 6.2 Step 1: Backend Setup (FastAPI)
+### 7.2 Step 1: Backend Setup (FastAPI)
 1.  Navigate into the `backend` directory:
     ```bash
     cd backend
@@ -1439,7 +1439,7 @@ Ensure the following packages are installed globally on your machine:
 
 ---
 
-### 6.3 Step 2: Web Dashboard Setup (React + Vite)
+### 7.3 Step 2: Web Dashboard Setup (React + Vite)
 1.  Navigate into the `frontend-web` directory:
     ```bash
     cd frontend-web
@@ -1457,7 +1457,7 @@ Ensure the following packages are installed globally on your machine:
 
 ---
 
-### 6.4 Step 3: Mobile App Setup (Flutter)
+### 7.4 Step 3: Mobile App Setup (Flutter)
 1.  Navigate into the `frontend-mobile` directory:
     ```bash
     cd frontend-mobile
@@ -1474,7 +1474,7 @@ Ensure the following packages are installed globally on your machine:
 
 ---
 
-## 7. How to Verify Custom Scenarios Live
+## 8. How to Verify Custom Scenarios Live
 
 We have built two custom datasets in `mock-data/` to test the system's dynamic reasoning. You can trigger these scenarios from the mobile or web app:
 
@@ -1527,7 +1527,7 @@ We have built two custom datasets in `mock-data/` to test the system's dynamic r
 
 ---
 
-## 8. Evaluation Criteria Mapping
+## 9. Evaluation Criteria Mapping
 
 This section maps the hackathon evaluation categories directly to SENTINEL's core system modules:
 
