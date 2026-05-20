@@ -783,6 +783,18 @@ http://localhost:8001
 
 Interactive Swagger documentation is always available at `<BASE_URL>/docs`.
 
+#### Quick Reference — All Endpoints
+
+| # | Method | Endpoint | Description | Auth | Status Codes |
+|---|--------|----------|-------------|------|-------------|
+| 1 | `GET` | `/health` | Server health check | None | `200` |
+| 2 | `POST` | `/api/v1/runs` | Start a new analysis run | None | `202`, `422`, `500` |
+| 3 | `GET` | `/api/v1/runs` | List all historical runs | None | `200` |
+| 4 | `GET` | `/api/v1/runs/{run_id}` | Get full run report (insights, actions, metrics, before/after) | None | `200`, `404` |
+| 5 | `GET` | `/api/v1/runs/{run_id}/trace` | Get raw ADK trace JSON (agent calls, tokens, timing) | None | `200`, `404` |
+| 6 | `POST` | `/api/v1/runs/{run_id}/approvals` | Submit approval decision (approve / reject / modify) | None | `200` |
+| 7 | `WS` | `/ws/runs/{run_id}` | Real-time WebSocket event stream (17 event types) | None | — |
+
 ---
 
 ### 5.1 `GET /health` — Health Check
