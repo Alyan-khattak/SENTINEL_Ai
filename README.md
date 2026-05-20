@@ -767,7 +767,531 @@ flowchart LR
 
 ---
 
-## 5. Detailed Walkthrough of System Structure
+## 5. API Gateway Reference & Testing Guide
+
+All SENTINEL APIs are served by FastAPI. The production base URL is:
+
+```
+https://sentinelai-production-e7d5.up.railway.app
+```
+
+For local development:
+
+```
+http://localhost:8001
+```
+
+Interactive Swagger documentation is always available at `<BASE_URL>/docs`.
+
+---
+
+### 5.1 `GET /health` — Health Check
+
+Returns service status. Use this to verify the server is online.
+
+**Request:**
+```bash
+curl https://sentinelai-production-e7d5.up.railway.app/health
+```
+
+**Response `200 OK`:**
+```json
+{
+  "status": "ok",
+  "service": "sentinel",
+  "version": "1.0.0"
+}
+```
+
+---
+
+### 5.2 `POST /api/v1/runs` — Start a New Analysis Run
+
+Kicks off the full 8-agent pipeline in the background. Returns immediately with a `run_id` and a WebSocket URL to stream live events.
+
+**Request:**
+```bash
+curl -X POST https://sentinelai-production-e7d5.up.railway.app/api/v1/runs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scenario": "inventory_shortage",
+    "sources": [
+      {"type": "csv",  "path": "mock-data/warehouse_stock_7days.csv"},
+      {"type": "pdf",  "path": "mock-data/supplier_email.pdf"},
+      {"type": "json", "path": "mock-data/sales_dashboard.json"},
+      {"type": "json", "path": "mock-data/complaints.json"},
+      {"type": "json", "path": "mock-data/news_feed.json"},
+      {"type": "json", "path": "mock-data/duplicate_spam_source.json"},
+      {"type": "json", "path": "mock-data/stale_irrelevant_source.json"}
+    ],
+    "constraints": {
+      "budget_pkr_max": 500000,
+      "time_to_resolution_hours_max": 48,
+      "notification_deadline_hours_max": 2,
+      "api_rate_limit_per_minute": 10,
+      "resource_constraints": {
+        "warehouse_staff": 3,
+        "delivery_trucks": 5
+      }
+    }
+  }'
+```
+
+**Request Body Schema (`AnalysisRequest`):**
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `scenario` | `string` | Yes | Scenario name, e.g. `"inventory_shortage"` |
+| `sources` | `array` | Yes | List of source objects with `type` and `path` |
+| `sources[].type` | `string` | Yes | One of: `csv`, `pdf`, `json`, `web`, `realtime_feed` |
+| `sources[].path` | `string` | Yes | Relative path to the mock data file |
+| `constraints` | `object` | No | Constraint overrides (uses defaults if omitted) |
+| `constraints.budget_pkr_max` | `integer` | No | Maximum budget in PKR (default: `500000`) |
+| `constraints.time_to_resolution_hours_max` | `integer` | No | Max hours to resolve (default: `48`) |
+| `constraints.notification_deadline_hours_max` | `integer` | No | Hours before stakeholders are notified (default: `2`) |
+| `constraints.api_rate_limit_per_minute` | `integer` | No | Max external API calls per minute (default: `10`) |
+| `constraints.resource_constraints` | `object` | No | Key-value pairs of available resources |
+
+**Response `202 Accepted`:**
+```json
+{
+  "run_id": "run_2026_05_20_a4b8c1",
+  "status": "queued",
+  "websocket_url": "/ws/runs/run_2026_05_20_a4b8c1"
+}
+```
+
+**Error Responses:**
+
+| Status | Meaning |
+|---|---|
+| `422` | Validation error — malformed request body |
+| `500` | Internal server error |
+
+---
+
+### 5.3 `GET /api/v1/runs` — List All Runs
+
+Returns a summary list of all historical and active runs.
+
+**Request:**
+```bash
+curl https://sentinelai-production-e7d5.up.railway.app/api/v1/runs
+```
+
+**Response `200 OK`:**
+```json
+{
+  "runs": [
+    {
+      "run_id": "run_2026_05_20_a4b8c1",
+      "scenario": "inventory_shortage",
+      "started_at": "2026-05-20T12:30:00Z",
+      "status": "completed"
+    },
+    {
+      "run_id": "run_2026_05_19_f3e2d1",
+      "scenario": "inventory_shortage",
+      "started_at": "2026-05-19T09:15:00Z",
+      "status": "completed"
+    }
+  ],
+  "total": 2
+}
+```
+
+---
+
+### 5.4 `GET /api/v1/runs/{run_id}` — Get Full Run Report
+
+Returns the complete run report including insights, contradictions, actions, execution logs, metrics, and before/after state comparisons.
+
+**Request:**
+```bash
+curl https://sentinelai-production-e7d5.up.railway.app/api/v1/runs/run_2026_05_20_a4b8c1
+```
+
+**Response `200 OK` (abbreviated):**
+```json
+{
+  "run_id": "run_2026_05_20_a4b8c1",
+  "scenario": "inventory_shortage",
+  "status": "completed",
+  "started_at": "2026-05-20T12:30:00Z",
+  "completed_at": "2026-05-20T12:31:45Z",
+  "work_plan": {
+    "high_level_steps": ["Ingest 7 sources", "Filter noise", "Extract insights", "..."],
+    "task_plan": [...]
+  },
+  "sources": [...],
+  "noise_assessments": [
+    {
+      "source_id": "src_duplicate_spam",
+      "is_duplicate": true,
+      "is_spam": true,
+      "is_stale": false,
+      "credibility_score": 1,
+      "keep_for_analysis": false,
+      "rejection_reason": "Duplicate content detected"
+    }
+  ],
+  "insights": [
+    {
+      "metric": "stock_level",
+      "value": "3200 units",
+      "confidence": 0.92,
+      "trend": "falling",
+      "rate_of_change": -542.8,
+      "risk_severity": "critical"
+    }
+  ],
+  "conflict_resolution": {
+    "contradictions": [
+      {
+        "metric": "stock_level",
+        "sources": ["warehouse_csv", "supplier_email"],
+        "resolution_type": "resolved",
+        "winner": "warehouse_csv",
+        "confidence": 0.87
+      }
+    ]
+  },
+  "actions": [
+    {
+      "action_id": "act_001",
+      "name": "Validate Current Stock",
+      "estimated_cost_pkr": 0,
+      "estimated_duration_minutes": 15,
+      "urgency_tier": "immediate",
+      "is_destructive": false,
+      "modification_applied": null
+    }
+  ],
+  "side_effects": [...],
+  "alternative_paths": [...],
+  "execution_log": {
+    "steps": [
+      {
+        "step_number": 1,
+        "action_id": "act_001",
+        "status": "completed",
+        "retried": false,
+        "rolled_back": false
+      },
+      {
+        "step_number": 3,
+        "action_id": "act_003",
+        "status": "completed",
+        "retried": true,
+        "rolled_back": false,
+        "error": "Supplier API 503 — retried successfully"
+      }
+    ]
+  },
+  "before_state": {
+    "stock_level": "3200 units (Critically Low)",
+    "supplier_lead_time": "14 Days",
+    "delivery_frequency": "Weekly",
+    "customer_complaints": "23 active",
+    "stockout_probability": "91%"
+  },
+  "after_state": {
+    "stock_level": "11200 units (Optimal)",
+    "supplier_lead_time": "7 Days (Express)",
+    "delivery_frequency": "Bi-Weekly",
+    "customer_complaints": "0 active",
+    "stockout_probability": "0%"
+  },
+  "baseline_comparison": {
+    "naive": {"decision": "Order 50,000 units emergency", "cost_wasted": 400000},
+    "rule_based": {"decision": "Order 25,000 units", "cost_wasted": 200000},
+    "sentinel": {"decision": "Order 8,000 units split in 2 batches", "cost_wasted": 0}
+  },
+  "metrics": {
+    "total_llm_calls": 8,
+    "total_tokens_in": 12450,
+    "total_tokens_out": 8320,
+    "total_cost_usd": 0.003,
+    "total_duration_seconds": 105.2,
+    "primary_model": "gemini-2.0-flash",
+    "fallback_used": false
+  }
+}
+```
+
+**Error Responses:**
+
+| Status | Meaning |
+|---|---|
+| `404` | Run ID not found or report not yet available |
+
+---
+
+### 5.5 `GET /api/v1/runs/{run_id}/trace` — Get ADK Trace JSON
+
+Returns the raw ADK trace log — a chronological array of every agent call, tool invocation, LLM prompt/response pair, and timing data.
+
+**Request:**
+```bash
+curl https://sentinelai-production-e7d5.up.railway.app/api/v1/runs/run_2026_05_20_a4b8c1/trace
+```
+
+**Response `200 OK` (abbreviated):**
+```json
+{
+  "run_id": "run_2026_05_20_a4b8c1",
+  "trace_entries": [
+    {
+      "agent": "PlannerAgent",
+      "started_at": "2026-05-20T12:30:01Z",
+      "completed_at": "2026-05-20T12:30:08Z",
+      "duration_ms": 7200,
+      "llm_provider": "gemini",
+      "input_tokens": 1240,
+      "output_tokens": 890,
+      "tool_calls": [],
+      "output_summary": "Generated 6-step work plan"
+    },
+    {
+      "agent": "IngestionAgent",
+      "started_at": "2026-05-20T12:30:08Z",
+      "completed_at": "2026-05-20T12:30:15Z",
+      "duration_ms": 6800,
+      "llm_provider": null,
+      "tool_calls": ["parse_csv", "parse_pdf", "parse_json"],
+      "output_summary": "Ingested 7 sources (5 valid, 2 noise candidates)"
+    }
+  ]
+}
+```
+
+**Error Responses:**
+
+| Status | Meaning |
+|---|---|
+| `404` | No trace found for the given run ID |
+
+---
+
+### 5.6 `POST /api/v1/runs/{run_id}/approvals` — Submit Approval Decision
+
+Delivers a human approval decision for a paused destructive action. The pipeline waits up to 60 seconds; if no decision arrives, it auto-approves.
+
+**Request:**
+```bash
+curl -X POST https://sentinelai-production-e7d5.up.railway.app/api/v1/runs/run_2026_05_20_a4b8c1/approvals \
+  -H "Content-Type: application/json" \
+  -d '{
+    "approval_id": "appr_001",
+    "decision": "approve",
+    "modification": null
+  }'
+```
+
+**Request Body Schema (`ApprovalDecision`):**
+
+| Field | Type | Required | Values | Description |
+|---|---|---|---|---|
+| `approval_id` | `string` | Yes | — | ID from the `approval_required` WS event |
+| `decision` | `string` | Yes | `approve`, `reject`, `modify` | The user's choice |
+| `modification` | `string` | No | — | Free-text modification instructions (only when `decision` is `modify`) |
+
+**Response `200 OK`:**
+```json
+{
+  "status": "delivered",
+  "run_id": "run_2026_05_20_a4b8c1"
+}
+```
+
+---
+
+### 5.7 `WS /ws/runs/{run_id}` — WebSocket Event Stream
+
+Connect to this endpoint to receive real-time pipeline events. The connection stays alive until `run_completed` or `run_failed` is emitted.
+
+**Connect with wscat (CLI):**
+```bash
+npx wscat -c wss://sentinelai-production-e7d5.up.railway.app/ws/runs/run_2026_05_20_a4b8c1
+```
+
+**Connect with JavaScript:**
+```javascript
+const ws = new WebSocket('wss://sentinelai-production-e7d5.up.railway.app/ws/runs/run_2026_05_20_a4b8c1');
+ws.onmessage = (e) => console.log(JSON.parse(e.data));
+```
+
+**All WebSocket Events (in chronological order):**
+
+| Event | When Emitted | Key Data Fields |
+|---|---|---|
+| `run_started` | Pipeline begins | `run_id`, `scenario`, `timestamp` |
+| `planner_done` | Planner Agent completes | `work_plan`, `task_plan` |
+| `ingestion_done` | All sources parsed | `sources[]` with `source_id`, `type`, `content_preview` |
+| `noise_filter_done` | Noise filtering complete | `assessments[]` with `source_id`, `keep`, `rejection_reason` |
+| `insight_done` | Insights extracted | `insights[]` with `metric`, `trend`, `rate_of_change` |
+| `conflict_done` | Contradictions resolved | `contradictions[]`, `resolution_type`, `winner` |
+| `action_planner_done` | Actions planned & validated | `actions[]` with `name`, `cost`, `is_destructive`, `modification` |
+| `side_effect_done` | Side-effects analyzed | `side_effects[]`, `alternative_paths[]` |
+| `approval_required` | Destructive action pending | `approval_id`, `action`, `predicted_impacts[]` |
+| `step_started` | Execution step begins | `step_number`, `action_name` |
+| `step_completed` | Execution step succeeds | `step_number`, `state_diff` |
+| `step_failed` | Execution step fails | `step_number`, `error`, `retry_count` |
+| `step_retrying` | Retry attempt initiated | `step_number`, `attempt`, `backoff_ms` |
+| `step_rolled_back` | Rollback to safe state | `step_number`, `rollback_target` |
+| `run_completed` | Pipeline finished | `run_id`, `status`, `metrics_summary` |
+| `run_failed` | Pipeline terminated on error | `run_id`, `error`, `last_step` |
+| `ping` | Keep-alive (every 120s) | `run_id` |
+
+**Example Event Payloads:**
+
+`planner_done`:
+```json
+{
+  "event": "planner_done",
+  "run_id": "run_2026_05_20_a4b8c1",
+  "timestamp": "2026-05-20T12:30:08Z",
+  "data": {
+    "work_plan": {
+      "high_level_steps": [
+        "Ingest and parse 7 heterogeneous data sources",
+        "Filter noise: reject duplicates, stale, and spam signals",
+        "Extract temporal insights with trend analysis",
+        "Detect and resolve contradictions via credibility scoring",
+        "Plan constraint-bound action chain",
+        "Execute actions with failure recovery"
+      ]
+    }
+  }
+}
+```
+
+`approval_required`:
+```json
+{
+  "event": "approval_required",
+  "run_id": "run_2026_05_20_a4b8c1",
+  "timestamp": "2026-05-20T12:31:10Z",
+  "data": {
+    "approval_id": "appr_001",
+    "action": {
+      "name": "Place Emergency Supplier Order",
+      "estimated_cost_pkr": 450000,
+      "is_destructive": true
+    },
+    "predicted_impacts": [
+      {"area": "cashflow", "magnitude": "high", "direction": "negative"},
+      {"area": "stock_availability", "magnitude": "high", "direction": "positive"}
+    ],
+    "alternative_path": {
+      "name": "Staggered Order",
+      "description": "Split into 3 smaller batches over 3 days",
+      "estimated_cost_pkr": 500000
+    }
+  }
+}
+```
+
+`step_failed` → `step_retrying`:
+```json
+{
+  "event": "step_failed",
+  "run_id": "run_2026_05_20_a4b8c1",
+  "timestamp": "2026-05-20T12:31:22Z",
+  "data": {
+    "step_number": 3,
+    "action_name": "Emergency Order",
+    "error": "Supplier API returned 503 Service Unavailable",
+    "retry_count": 0
+  }
+}
+```
+```json
+{
+  "event": "step_retrying",
+  "run_id": "run_2026_05_20_a4b8c1",
+  "timestamp": "2026-05-20T12:31:23Z",
+  "data": {
+    "step_number": 3,
+    "attempt": 1,
+    "backoff_ms": 1000
+  }
+}
+```
+
+---
+
+### 5.8 API Testing Checklist
+
+Use the following step-by-step sequence to verify the entire API surface end-to-end:
+
+```
+Step 1 — Verify server is alive
+  → GET /health
+  → Expect: {"status":"ok"}
+
+Step 2 — Start a new run
+  → POST /api/v1/runs  (with full JSON body from §5.2)
+  → Expect: 202 + run_id
+
+Step 3 — Connect WebSocket immediately
+  → WS /ws/runs/<run_id>
+  → Expect: events stream in order (run_started → planner_done → ... → run_completed)
+
+Step 4 — When approval_required arrives, submit decision
+  → POST /api/v1/runs/<run_id>/approvals
+  → Expect: {"status":"delivered"}
+  → Expect: execution resumes on WebSocket
+
+Step 5 — After run_completed, fetch the full report
+  → GET /api/v1/runs/<run_id>
+  → Expect: 200 with full RunReport JSON
+
+Step 6 — Fetch the raw ADK trace
+  → GET /api/v1/runs/<run_id>/trace
+  → Expect: 200 with chronological trace_entries
+
+Step 7 — Verify it appears in the run list
+  → GET /api/v1/runs
+  → Expect: the new run_id appears in the runs array
+```
+
+**Testing with Postman:**
+1. Import the Swagger spec from `<BASE_URL>/openapi.json`
+2. All endpoints auto-populate with schemas
+3. For WebSocket testing, use the Postman WebSocket tab or the `wscat` CLI tool
+
+**Testing with curl + wscat:**
+```bash
+# Terminal 1: Start a run
+RUN_ID=$(curl -s -X POST http://localhost:8001/api/v1/runs \
+  -H "Content-Type: application/json" \
+  -d '{"scenario":"inventory_shortage","sources":[{"type":"csv","path":"mock-data/warehouse_stock_7days.csv"},{"type":"json","path":"mock-data/sales_dashboard.json"}],"constraints":{"budget_pkr_max":500000,"time_to_resolution_hours_max":48}}' \
+  | python -c "import sys,json; print(json.load(sys.stdin)['run_id'])")
+
+echo "Run started: $RUN_ID"
+
+# Terminal 2: Stream WebSocket events
+npx wscat -c ws://localhost:8001/ws/runs/$RUN_ID
+
+# Terminal 1: When approval_required appears, approve it
+curl -X POST http://localhost:8001/api/v1/runs/$RUN_ID/approvals \
+  -H "Content-Type: application/json" \
+  -d '{"approval_id":"appr_001","decision":"approve","modification":null}'
+
+# Terminal 1: After run_completed, fetch the report
+curl http://localhost:8001/api/v1/runs/$RUN_ID | python -m json.tool
+
+# Terminal 1: Fetch the ADK trace
+curl http://localhost:8001/api/v1/runs/$RUN_ID/trace | python -m json.tool
+
+# Terminal 1: List all runs
+curl http://localhost:8001/api/v1/runs | python -m json.tool
+```
+
+---
+
+## 6. Detailed Walkthrough of System Structure
 
 ### 5.1 Project Folder Layout
 The codebase is organized into modules, isolating backend, mobile app, web dashboard, and test datasets:
